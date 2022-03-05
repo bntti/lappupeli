@@ -87,12 +87,22 @@ def start() -> str:
     if len(player_words) == 0:
         if len(words) == 0:
             return redirect('/')
-        word = word_list_pop()
-        list = [word for _ in range(players - 1)]
-        list.append("Sinä sait tyhjän kortin! GLHF")
-        random.shuffle(list)
-        for word in list:
-            add_to_player_list(word)
+        r = random.randint(1, 10)
+        if r == 0:
+            for _ in range(players):
+                add_to_player_list("Sinä sait tyhjän kortin! GLHF")
+        else:
+            word = word_list_pop()
+            list = [word for _ in range(players - 1)]
+            if r == 1:
+                list.pop(0)
+                list.pop(0)
+                list.append("Kouvola")
+                list.append("Neuvostoliitto")
+            list.append("Sinä sait tyhjän kortin! GLHF")
+            random.shuffle(list)
+            for word in list:
+                add_to_player_list(word)
     return redirect('/')
 
 
