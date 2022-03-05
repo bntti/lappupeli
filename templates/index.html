@@ -1,0 +1,15 @@
+<h1>Lappupeli</h1>
+<p>Sanojen määrä {{words | length}}</p>
+<p>Pelaajamäärä {{players}}</p>
+<a href="/word">Saa lappu</a>
+
+<hr />
+
+<form method="post">
+    Lisää sana:
+    <input type="text" name="word" />
+    <br />
+    Pelaajien määrä:
+    <input type="number" name="players" value="{{players}}" />
+    <input type="submit" value="submit" />
+</form>
