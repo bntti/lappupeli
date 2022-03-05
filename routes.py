@@ -1,4 +1,4 @@
-from flask import render_template, request
+from flask import redirect, render_template, request
 import random
 from app import app
 from database import database
@@ -9,17 +9,18 @@ def get_words():
     return [a[0] for a in database.session.execute(sql).fetchall()]
 
 
-def set_words(word):
-    sql = "INSERT INTO words (word) VALUES (:word)"
-    database.session.execute(sql, {"word": word})
-    database.session.commit()
+def add_word_to_words(word):
+    try:
+        sql = "INSERT INTO words (word) VALUES (:word)"
+        database.session.execute(sql, {"word": word})
+        database.session.commit()
+    except:
+        database.session.rollback()
 
 
 def word_list_pop():
-    sql = "SELECT word, id FROM words ORDER BY random() LIMIT 1"
-    word, id = database.session.execute(sql).fetchone()
-    sql = "DELETE FROM words WHERE id = :id"
-    database.session.execute(sql, {"id": id})
+    sql = "DELETE FROM words WHERE id = (SELECT id FROM words LIMIT 1) RETURNING word"
+    word = database.session.execute(sql).fetchone()[0]
     database.session.commit()
     return word
 
@@ -47,23 +48,21 @@ def add_to_player_list(word):
 
 
 def player_list_pop():
-    sql = "SELECT word, id FROM player_words ORDER BY random() LIMIT 1"
-    word, id = database.session.execute(sql).fetchone()
-    sql = "DELETE FROM player_words WHERE id = :id"
-    database.session.execute(sql, {"id": id})
+    sql = "DELETE FROM player_words WHERE id = (SELECT id FROM player_words LIMIT 1) RETURNING word"
+    word = database.session.execute(sql).fetchone()[0]
     database.session.commit()
     return word
 
 
 @app.route("/", methods=["GET"])
 def index_get() -> str:
-    return render_template("index.html", words=get_words(), players=get_players())
+    return render_template("index.html", words=get_words(), players=get_players(), player_words=get_player_words())
 
 
 @app.route("/", methods=["POST"])
 def index_post() -> str:
     if request.form.get("word"):
-        set_words(request.form.get("word"))
+        add_word_to_words(request.form.get("word"))
     if int(request.form.get("players")) != get_players():
         set_players(int(request.form.get("players")))
     return index_get()
@@ -71,18 +70,37 @@ def index_post() -> str:
 
 @app.route("/word")
 def word() -> str:
+    player_words = get_player_words()
+    if len(player_words) == 0:
+        return render_template("word.html", word="Sanat loppuivat")
+
+    word = player_list_pop()
+    return render_template("word.html", word=word)
+
+
+@app.route("/start")
+def start() -> str:
     players = get_players()
     words = get_words()
     player_words = get_player_words()
 
-    print(f"1 {players=} {words=} {player_words=}")
     if len(player_words) == 0:
         if len(words) == 0:
-            return render_template("word.html", word="Sanat loppuivat")
+            return redirect('/')
         word = word_list_pop()
-        for _ in range(players - 1):
+        list = [word for _ in range(players - 1)]
+        list.append("Sinä sait tyhjän kortin! GLHF")
+        random.shuffle(list)
+        for word in list:
             add_to_player_list(word)
-        add_to_player_list("Sinä sait tyhjän kortin")
+    return redirect('/')
 
-    word = player_list_pop()
-    return render_template("word.html", word=word)
+
+@app.route("/clear")
+def clear():
+    sql = "DELETE FROM words"
+    database.session.execute(sql)
+    sql = "DELETE FROM player_words"
+    database.session.execute(sql)
+    database.session.commit()
+    return redirect('/')

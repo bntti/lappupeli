@@ -1,6 +1,6 @@
 CREATE TABLE words (
     id SERIAL PRIMARY KEY,
-    word TEXT NOT NULL
+    word TEXT UNIQUE
 );
 CREATE TABLE player_words (
     id SERIAL PRIMARY KEY,
