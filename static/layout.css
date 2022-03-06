@@ -1,0 +1,57 @@
+.content {
+  margin: 10px;
+}
+
+.table-container {
+  border-style: solid;
+  width: fit-content;
+  border-radius: 5px;
+  border-width: 2px;
+  margin-bottom: 5px;
+  overflow: hidden;
+}
+table {
+  border-collapse: collapse;
+}
+tr:nth-child(even) {
+  background-color: #ddf;
+}
+td {
+  padding: 5px;
+}
+
+.linkbutton {
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 2px;
+  padding: 1px 3px;
+  margin: 10px 0px;
+  width: fit-content;
+}
+.disabled-linkbutton {
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 2px;
+  padding: 1px 3px;
+  margin: 10px 0px;
+  color: grey;
+  width: fit-content;
+}
+
+.linkbutton a {
+  text-decoration: none;
+  color: blue;
+}
+
+.word {
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 2px;
+  padding: 20px;
+  width: fit-content;
+  margin-bottom: 20px;
+}
+
+.word h1 {
+  margin: 0px;
+}

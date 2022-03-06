@@ -1,21 +1,61 @@
+{% extends "layout.html" %}
+{% block content %}
+
 <h1>Lappupeli</h1>
-<p>Varastossa olevien sanojen määrä {{words | length}}</p>
-<p>Tällä hetkellä näytettävien sanojen määrä {{player_words | length}}</p>
-<p>Pelaajamäärä {{players}}</p>
-<a href="/word">Saa lappu</a>
-<br />
-<a href="/start">Aloita peli (Siirrä sana varastosta näytettäviin sanoihin</a>
+<div class="table-container">
+    <table>
+        <tbody>
+            <tr>
+                <td>Sanojen määrä</td>
+                <td>{{words | length}}</td>
+            </tr>
+            <tr>
+                <td>Lapun lukeneet</td>
+                <td>{{seen_count}}</td>
+            </tr>
+            <tr>
+                <td>Pelaajien määrä</td>
+                <td>{{config.players}}</td>
+            </tr>
+            <tr>
+                <td>Edellinen sana</td>
+                {% if config.previous_word %}
+                <td>{{config.previous_word}}</td>
+                {% else %}
+                <td></td>
+                {% endif %}
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% if new %}
+<p><strong>Uusi lappu saatavilla!</strong></p>
+{% endif %}
+<p class="linkbutton"><a href="/word">Katso lappusi</a></p>
+{% if words | length > 0 %}
+<p class="linkbutton"><a href="/start">Seuraava sana</a></p>
+{% else %}
+<p class="disabled-linkbutton">Seuraava sana</p>
+{% endif %}
 
 <hr />
 
 <form method="post">
-    Lisää sana:
-    <input type="text" name="word" />
+    <label for="word">Lisää sana:</label>
     <br />
-    Pelaajien määrä:
-    <input type="number" name="players" value="{{players}}" />
-    <input type="submit" value="submit" />
+    <input id="word" type="text" name="word" />
+    <input type="submit" value="Lisää" />
 </form>
 
+<form method="post">
+    <label for="players">Pelaajien määrä:</label>
+    <br />
+    <input id="players" type="number" name="players" value="{{config.players}}" />
+    <input type="submit" value="Muuta" />
+</form>
 
-<a href="/clear">TYHJENNÄ SANAT</a>
+<hr />
+
+<p class="linkbutton"><a href="/clear">POISTA KAIKKI SANAT</a></p>
+{% endblock %}

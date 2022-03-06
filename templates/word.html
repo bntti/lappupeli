@@ -1,2 +1,10 @@
-<h1>{{word}}</h1>
-<a href="/">Takaisin</a>
+{% extends "layout.html" %}
+{% block content %}
+
+<h1>Lappusi:</h1>
+<div class="word">
+    <h2>{{word}}</h2>
+</div>
+<p class="linkbutton"><a href="/">Takaisin</a></p>
+
+{% endblock %}

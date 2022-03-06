@@ -1,118 +1,76 @@
-from flask import redirect, render_template, request
+from uuid import uuid4
+from flask import redirect, render_template, request, session
 import random
 from app import app
-from database import database
+import database_service as dts
+
+EMPTY = "Sait tyhjän lapun!"
 
 
-def get_words():
-    sql = "SELECT word FROM words"
-    return [a[0] for a in database.session.execute(sql).fetchall()]
-
-
-def add_word_to_words(word):
-    try:
-        sql = "INSERT INTO words (word) VALUES (:word)"
-        database.session.execute(sql, {"word": word})
-        database.session.commit()
-    except:
-        database.session.rollback()
-
-
-def word_list_pop():
-    sql = "DELETE FROM words WHERE id = (SELECT id FROM words LIMIT 1) RETURNING word"
-    word = database.session.execute(sql).fetchone()[0]
-    database.session.commit()
-    return word
-
-
-def get_player_words():
-    sql = "SELECT word FROM player_words"
-    return [a[0] for a in database.session.execute(sql).fetchall()]
-
-
-def get_players():
-    sql = "SELECT players FROM config"
-    return database.session.execute(sql).fetchone()[0]
-
-
-def set_players(players):
-    sql = "UPDATE config SET players = :players"
-    database.session.execute(sql, {"players": players})
-    database.session.commit()
-
-
-def add_to_player_list(word):
-    sql = "INSERT INTO player_words (word) VALUES (:word)"
-    database.session.execute(sql, {"word": word})
-    database.session.commit()
-
-
-def player_list_pop():
-    sql = "DELETE FROM player_words WHERE id = (SELECT id FROM player_words LIMIT 1) RETURNING word"
-    word = database.session.execute(sql).fetchone()[0]
-    database.session.commit()
-    return word
+def check_uuid():
+    if "uuid" not in session:
+        session["uuid"] = uuid4()
 
 
 @app.route("/", methods=["GET"])
 def index_get() -> str:
-    return render_template("index.html", words=get_words(), players=get_players(), player_words=get_player_words())
+    check_uuid()
+    new = not dts.has_word(session["uuid"]) and dts.get_player_list_size() > 0
+    return render_template(
+        "index.html",
+        words=dts.get_words(),
+        config=dts.get_config(),
+        seen_count=dts.get_seen_count(),
+        new=new
+    )
 
 
 @app.route("/", methods=["POST"])
 def index_post() -> str:
     if request.form.get("word"):
-        add_word_to_words(request.form.get("word"))
-    if int(request.form.get("players")) != get_players():
-        set_players(int(request.form.get("players")))
+        dts.add_word(request.form.get("word"))
+    if request.form.get("players"):
+        dts.set_players(int(request.form.get("players")))
     return index_get()
 
 
 @app.route("/word")
 def word() -> str:
-    player_words = get_player_words()
-    if len(player_words) == 0:
-        return render_template("word.html", word="Sanat loppuivat")
+    check_uuid()
+    players = dts.get_config()["players"]
 
-    word = player_list_pop()
-    return render_template("word.html", word=word)
+    if dts.has_word(session["uuid"]):
+        return render_template("word.html", word=dts.get_word(session["uuid"]))
+    if dts.get_player_list_size() == 0:
+        return render_template("word.html", word=f"Ei lappuja jäljellä")
+    elif dts.get_player_list_size() - dts.get_seen_count() == 0:
+        return render_template("word.html", word=f"Lappuja on jo jaettu {players} kpl")
+    else:
+        dts.give_word(session["uuid"])
+        return render_template("word.html", word=dts.get_word(session["uuid"]))
 
 
 @app.route("/start")
 def start() -> str:
-    players = get_players()
-    words = get_words()
-    player_words = get_player_words()
+    words = dts.get_words()
+    if len(words) == 0:
+        return redirect('/')
 
-    if len(player_words) == 0:
-        if len(words) == 0:
-            return redirect('/')
-        r = random.randint(1, 10)
-        if r == 0:
-            for _ in range(players):
-                add_to_player_list("Sinä sait tyhjän kortin! GLHF")
-        else:
-            word = word_list_pop()
-            list = [word for _ in range(players - 1)]
-            list.append("Sinä sait tyhjän kortin! GLHF")
-            if r == 1:
-                list = ["Suomi", "Etelä-Afrikka", "Pohjois-Korea", "Japani",
-                        "Australia", "Yhdysvallat", "Etelämanner", "Lada"]
-                while len(list) < players:
-                    list.append("Sinä sait tyhjän kortin! GLHF")
-            random.shuffle(list)
-            while len(list) > players:
-                list.pop(0)
-            for word in list:
-                add_to_player_list(word)
+    players = dts.get_config()["players"]
+    dts.clear_player_words()
+
+    r = random.randint(1, 10)
+    word = dts.pop_word() if r != 1 else EMPTY
+
+    for _ in range(players - 1):
+        dts.add_to_player_list(word)
+    dts.add_to_player_list(EMPTY)
+    dts.update_previous_word()
+    dts.update_current_word(word)
     return redirect('/')
 
 
 @app.route("/clear")
 def clear():
-    sql = "DELETE FROM words"
-    database.session.execute(sql)
-    sql = "DELETE FROM player_words"
-    database.session.execute(sql)
-    database.session.commit()
+    dts.clear_tables()
     return redirect('/')
