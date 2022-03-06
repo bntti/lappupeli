@@ -18,7 +18,7 @@ def add_word(word):
 
 
 def pop_word():
-    sql = "DELETE FROM words WHERE id = (SELECT id FROM words LIMIT 1) RETURNING word"
+    sql = "DELETE FROM words WHERE id = (SELECT id FROM words ORDER BY random() LIMIT 1) RETURNING word"
     word = database.session.execute(sql).fetchone()[0]
     database.session.commit()
     return word
@@ -73,8 +73,6 @@ def has_word(uuid):
 
 
 def give_word(uuid):
-    if has_word(uuid):
-        return
     sql = "UPDATE player_words SET uuid = :uuid WHERE id = (SELECT id FROM player_words WHERE uuid IS NULL ORDER BY random() LIMIT 1)"
     database.session.execute(sql, {"uuid": uuid})
     database.session.commit()
