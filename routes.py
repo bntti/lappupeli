@@ -94,13 +94,15 @@ def start() -> str:
         else:
             word = word_list_pop()
             list = [word for _ in range(players - 1)]
-            if r == 1:
-                list.pop(0)
-                list.pop(0)
-                list.append("Kouvola")
-                list.append("Neuvostoliitto")
             list.append("Sinä sait tyhjän kortin! GLHF")
+            if r == 1:
+                list = ["Suomi", "Etelä-Afrikka", "Pohjois-Korea", "Japani",
+                        "Australia", "Yhdysvallat", "Etelämanner", "Lada"]
+                while len(list) < players:
+                    list.append("Sinä sait tyhjän kortin! GLHF")
             random.shuffle(list)
+            while len(list) > players:
+                list.pop(0)
             for word in list:
                 add_to_player_list(word)
     return redirect('/')
