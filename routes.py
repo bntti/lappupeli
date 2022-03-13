@@ -7,11 +7,41 @@ import database_service as dts
 EMPTY = "Sait tyhjän lapun!"
 
 
-def check_uuid():
+# Functions
+def check_uuid() -> None:
     if "uuid" not in session:
         session["uuid"] = uuid4()
 
 
+def check_admin() -> bool:
+    admin_uuid = dts.get_config()["admin_uuid"]
+    return admin_uuid == session["uuid"]
+
+
+def next_word() -> None:
+    words = dts.get_words()
+    if len(words) == 0:
+        return
+
+    players = dts.get_config()["players"]
+    dts.clear_player_words()
+
+    r = random.randint(1, 10)
+    word = dts.pop_word() if r != 1 else EMPTY
+
+    for _ in range(players - 1):
+        dts.add_to_player_list(word)
+    dts.add_to_player_list(EMPTY)
+    dts.updage_previous_word()
+    dts.set_current_word(word)
+    return redirect('/')
+
+
+def clear() -> None:
+    dts.clear_tables()
+
+
+# Routes
 @app.route("/", methods=["GET"])
 def index_get() -> str:
     check_uuid()
@@ -21,7 +51,8 @@ def index_get() -> str:
         words=dts.get_words(),
         config=dts.get_config(),
         seen_count=dts.get_seen_count(),
-        new=new
+        new=new,
+        admin=check_admin()
     )
 
 
@@ -31,6 +62,13 @@ def index_post() -> str:
         dts.add_word(request.form.get("word"))
     if request.form.get("players"):
         dts.set_players(int(request.form.get("players")))
+    if request.form.get("be_admin"):
+        check_uuid()
+        dts.set_admin_uuid(session["uuid"])
+    if request.form.get("next_word") and check_admin():
+        next_word()
+    if request.form.get("clear") and check_admin():
+        clear()
     return index_get()
 
 
@@ -48,29 +86,3 @@ def word() -> str:
     else:
         dts.give_word(session["uuid"])
         return render_template("word.html", word=dts.get_word(session["uuid"]))
-
-
-@app.route("/start")
-def start() -> str:
-    words = dts.get_words()
-    if len(words) == 0:
-        return redirect('/')
-
-    players = dts.get_config()["players"]
-    dts.clear_player_words()
-
-    r = random.randint(1, 10)
-    word = dts.pop_word() if r != 1 else EMPTY
-
-    for _ in range(players - 1):
-        dts.add_to_player_list(word)
-    dts.add_to_player_list(EMPTY)
-    dts.update_previous_word()
-    dts.update_current_word(word)
-    return redirect('/')
-
-
-@app.route("/clear")
-def clear():
-    dts.clear_tables()
-    return redirect('/')

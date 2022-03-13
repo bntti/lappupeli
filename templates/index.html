@@ -32,30 +32,42 @@
 {% if new %}
 <p><strong>Uusi lappu saatavilla!</strong></p>
 {% endif %}
-<p class="linkbutton"><a href="/word">Katso lappusi</a></p>
-{% if words | length > 0 %}
-<p class="linkbutton"><a href="/start">Seuraava sana</a></p>
-{% else %}
-<p class="disabled-linkbutton">Seuraava sana</p>
-{% endif %}
-
-<hr />
+<button><a href="/word">Katso lappusi</a></button>
 
 <form method="post">
     <label for="word">Lisää sana:</label>
     <br />
-    <input id="word" type="text" name="word" />
+    <input id="word" type="text" name="word" placeholder="Sana" />
     <input type="submit" value="Lisää" />
-</form>
-
-<form method="post">
-    <label for="players">Pelaajien määrä:</label>
-    <br />
-    <input id="players" type="number" name="players" value="{{config.players}}" />
-    <input type="submit" value="Muuta" />
 </form>
 
 <hr />
 
-<p class="linkbutton"><a href="/clear">POISTA KAIKKI SANAT</a></p>
+{% if session.uuid != config.admin_uuid %}
+<form method="post">
+    <input name="be_admin" type="submit" value="Ole GM" />
+</form>
+{% else %}
+<h3>GMalue</h3>
+
+{% if words | length > 0 %}
+<form method="post">
+    <input type="submit" name="clear" value="Seuraava sana" />
+</form>
+{% else %}
+<button disabled>Seuraava sana</button>
+{% endif %}
+
+<form method="post">
+    <label for="players">Pelaajien määrä:</label>
+    <br />
+    <input id="players" type="number" name="players" value="{{config.players}}" placeholder="Pelaajien määrä" />
+    <input type="submit" value="Muuta" />
+</form>
+
+<form method="post">
+    <input type="submit" name="clear" class="red" value="POISTA KAIKKI SANAT" />
+</form>
+{% endif %}
+
 {% endblock %}

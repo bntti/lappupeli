@@ -1,3 +1,51 @@
+/* ---------- General ---------- */
+input[type="text"],
+input[type="number"],
+input[type="submit"],
+button {
+  background-color: #fff;
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 2px;
+  padding: 3px 5px;
+  margin: 10px 0px;
+  width: fit-content;
+  border-color: blue;
+}
+button,
+input[type="submit"] {
+  color: blue;
+}
+button:hover,
+input[type="submit"]:hover {
+  background-color: #eef;
+}
+button:disabled {
+  color: #aaf !important;
+  border-color: #aaf !important;
+  background-color: #eef !important;
+}
+button:disabled:hover {
+  background-color: #eef !important;
+}
+button a {
+  text-decoration: none;
+  color: blue;
+}
+
+/* Hide up and down buttons from number input */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ---------- Index ---------- */
 .content {
   margin: 10px;
 }
@@ -20,29 +68,16 @@ td {
   padding: 5px;
 }
 
-.linkbutton {
-  border-style: solid;
-  border-radius: 5px;
-  border-width: 2px;
-  padding: 1px 3px;
-  margin: 10px 0px;
-  width: fit-content;
+.red,
+.red a {
+  color: red !important;
+  border-color: red !important;
 }
-.disabled-linkbutton {
-  border-style: solid;
-  border-radius: 5px;
-  border-width: 2px;
-  padding: 1px 3px;
-  margin: 10px 0px;
-  color: grey;
-  width: fit-content;
+.red:hover {
+  background-color: #fee !important;
 }
 
-.linkbutton a {
-  text-decoration: none;
-  color: blue;
-}
-
+/* ---------- Word ---------- */
 .word {
   border-style: solid;
   border-radius: 5px;
@@ -51,7 +86,6 @@ td {
   width: fit-content;
   margin-bottom: 20px;
 }
-
 .word h1 {
   margin: 0px;
 }
