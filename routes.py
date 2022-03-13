@@ -14,6 +14,7 @@ def check_uuid() -> None:
 
 
 def check_admin() -> bool:
+    check_uuid()
     admin_uuid = dts.get_config()["admin_uuid"]
     return admin_uuid == session["uuid"]
 
@@ -27,14 +28,32 @@ def next_word() -> None:
     dts.clear_player_words()
 
     r = random.randint(1, 10)
-    word = dts.pop_word() if r != 1 else EMPTY
+    next_word, suggester_uuid = dts.pop_word() if r != 1 else (EMPTY, None)
+    print("NEXT WORD", next_word, suggester_uuid)
 
-    for _ in range(players - 1):
-        dts.add_to_player_list(word)
+    for _ in range(players - 2):
+        dts.add_to_player_list(next_word)
     dts.add_to_player_list(EMPTY)
-    dts.updage_previous_word()
-    dts.set_current_word(word)
-    return redirect('/')
+    dts.next_word(next_word, suggester_uuid)
+
+
+def get_word() -> str:
+    config = dts.get_config()
+
+    if dts.has_word(session["uuid"]):
+        return dts.get_word(session["uuid"])
+    if session["uuid"] == config["suggester_uuid"]:
+        dts.add_suggester_to_player_list(
+            config["current_word"], config["suggester_uuid"]
+        )
+        return config["current_word"]
+    if dts.get_player_list_size() == 0:
+        return "Ei lappuja jäljellä"
+    if dts.get_player_list_size() - dts.get_seen_count() == 0:
+        return f"Lappuja on jo jaettu {config['players']} kpl"
+
+    dts.give_word(session["uuid"])
+    return dts.get_word(session["uuid"])
 
 
 def clear() -> None:
@@ -58,12 +77,12 @@ def index_get() -> str:
 
 @app.route("/", methods=["POST"])
 def index_post() -> str:
+    check_uuid()
     if request.form.get("word"):
-        dts.add_word(request.form.get("word"))
+        dts.add_word(request.form.get("word"), session["uuid"])
     if request.form.get("players"):
         dts.set_players(int(request.form.get("players")))
     if request.form.get("be_admin"):
-        check_uuid()
         dts.set_admin_uuid(session["uuid"])
     if request.form.get("unbe_admin") and check_admin():
         dts.set_admin_uuid(None)
@@ -77,14 +96,4 @@ def index_post() -> str:
 @app.route("/word")
 def word() -> str:
     check_uuid()
-    players = dts.get_config()["players"]
-
-    if dts.has_word(session["uuid"]):
-        return render_template("word.html", word=dts.get_word(session["uuid"]))
-    if dts.get_player_list_size() == 0:
-        return render_template("word.html", word=f"Ei lappuja jäljellä")
-    elif dts.get_player_list_size() - dts.get_seen_count() == 0:
-        return render_template("word.html", word=f"Lappuja on jo jaettu {players} kpl")
-    else:
-        dts.give_word(session["uuid"])
-        return render_template("word.html", word=dts.get_word(session["uuid"]))
+    return render_template("word.html", word=get_word())
