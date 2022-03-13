@@ -65,6 +65,8 @@ def index_post() -> str:
     if request.form.get("be_admin"):
         check_uuid()
         dts.set_admin_uuid(session["uuid"])
+    if request.form.get("unbe_admin") and check_admin():
+        dts.set_admin_uuid(None)
     if request.form.get("next_word") and check_admin():
         next_word()
     if request.form.get("clear") and check_admin():
