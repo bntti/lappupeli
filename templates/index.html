@@ -32,10 +32,13 @@
 
 <br />
 
-{% if new %}
-<p><strong>Uusi lappu saatavilla!</strong></p>
+{% if no_words %}
+<button disabled>Peliä ei ole vielä aloitettu</button>
+{% elif new %}
+<button><a href="/word">Katso uusi lappu</a></button>
+{% else %}
+<button><a href="/word">Katso lappusi uudestaan</a></button>
 {% endif %}
-<button><a href="/word">Katso lappusi</a></button>
 
 <form method="post">
     <label for="word">Lisää sana:</label>
@@ -51,7 +54,7 @@
     <input name="be_admin" type="submit" value="Ole GM" />
 </form>
 {% else %}
-<h3>GMAlue</h3>
+<h3 style="margin-bottom:10px">GMAlue</h3>
 
 {% if words | length > 0 %}
 <form method="post">

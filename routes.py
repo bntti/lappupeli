@@ -29,7 +29,6 @@ def next_word() -> None:
 
     r = random.randint(1, 10)
     next_word, suggester_uuid = dts.pop_word() if r != 1 else (EMPTY, None)
-    print("NEXT WORD", next_word, suggester_uuid)
 
     for _ in range(players - 2):
         dts.add_to_player_list(next_word)
@@ -70,6 +69,7 @@ def index_get() -> str:
         words=dts.get_words(),
         config=dts.get_config(),
         seen_count=dts.get_seen_count(),
+        no_words=dts.get_player_list_size() == 0,
         new=new,
         admin=check_admin()
     )

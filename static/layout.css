@@ -57,6 +57,7 @@ input[type="number"] {
   border-width: 2px;
   margin-bottom: 5px;
   overflow: hidden;
+  border-color: #77f;
 }
 table {
   border-collapse: collapse;
