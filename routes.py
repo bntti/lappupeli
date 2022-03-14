@@ -158,7 +158,7 @@ def room_post(room_name: str) -> Union[str, Response]:
     if request.form.get("next_word"):
         if dts.get_player_list_size(room_id) != dts.get_seen_count(room_id):
             session["confirm"] = "confirm_next_word"
-            session["confirm_message"] = "Kaikki eivät ole vielä valinneet sanaansa, haluatko varmasti seuraavan sanan?"
+            session["confirm_message"] = "Kaikki eivät ole vielä nähneet sanaansa, haluatko varmasti seuraavan sanan?"
         else:
             next_word(room_id)
     if request.form.get("clear"):

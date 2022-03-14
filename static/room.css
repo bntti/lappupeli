@@ -1,4 +1,13 @@
-.confirm-buttons {
+.confirm {
+  padding: 10px;
+  padding-bottom: 6px;
+  background-color: #eef;
+  border-radius: 5px;
+}
+.confirm p {
+  margin: 0px;
+}
+.confirm .confirm-buttons {
   display: grid;
   column-gap: 5px;
   grid-template-columns: calc(50% - 2.5px) calc(50% - 2.5px);

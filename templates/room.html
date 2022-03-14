@@ -70,13 +70,15 @@
 <h2 style="margin-bottom: 10px">GMAlue</h2>
 
 {% if session.confirm %}
-<p style="margin-bottom: 0px">{{session.confirm_message}}</p>
-<form method="post">
-    <div class="confirm-buttons">
-        <input type="submit" class="red" name="confirm" value="Varmista" />
-        <input type="submit" name="cancel" value="Peruuta" />
-    </div>
-</form>
+<div class="confirm">
+    <p>{{session.confirm_message}}</p>
+    <form method="post">
+        <div class="confirm-buttons">
+            <input type="submit" class="red" name="confirm" value="Varmista" />
+            <input type="submit" name="cancel" value="Peruuta" />
+        </div>
+    </form>
+</div>
 <br />
 {% endif %}
 
