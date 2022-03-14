@@ -1,24 +1,22 @@
-.table-container {
-  border-style: solid;
-  border-radius: 5px;
-  border-width: 2px;
-  margin-bottom: 5px;
-  overflow: hidden;
-  border-color: #77f;
+.room td:nth-child(1) {
+  padding: 0px !important;
 }
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-tr:nth-child(even) {
-  background-color: #ddf;
-}
-td {
-  padding: 10px;
-}
-td:nth-child(1) {
-  min-width: 140px;
-}
-td:nth-child(2) {
+.room td:nth-child(2) {
+  padding: 0px !important;
   text-align: right;
+}
+tr.room:nth-child(even) {
+  background-color: #eef;
+}
+tr.room:hover {
+  background-color: #ddf !important;
+}
+
+.room a {
+  display: block;
+  height: 100%;
+  width: calc(100% - 20px);
+  padding: 10px;
+  text-decoration: none;
+  color: black;
 }

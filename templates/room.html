@@ -1,0 +1,100 @@
+{% extends "layout.html" %}
+{% block stylesheet %}
+<link rel="stylesheet" href="/static/room.css">
+{% endblock %}
+{% block content %}
+
+<h1>{{room_name}}</h1>
+<div class="table-container">
+    <table>
+        <tbody>
+            <tr>
+                <td>Sanojen määrä</td>
+                <td>{{words | length}}</td>
+            </tr>
+            <tr>
+                <td>Lapun lukeneet</td>
+                <td>{{seen_count}}</td>
+            </tr>
+            <tr>
+                <td>Pelaajien määrä</td>
+                <td>{{config.players}}</td>
+            </tr>
+            <tr>
+                <td>Edellinen sana</td>
+                {% if config.previous_word %}
+                <td>{{config.previous_word}}</td>
+                {% else %}
+                <td></td>
+                {% endif %}
+            </tr>
+        </tbody>
+    </table>
+</div>
+<form action="/room/{{room_name | urlencode}}">
+    <input type="submit" value="Päivitä sivu" />
+</form>
+
+<form action="/room/{{room_name | urlencode}}/word">
+    {% if no_words %}
+    <input type="submit" disabled value="Peliä ei ole vielä aloitettu" />
+    {% elif new %}
+    <input type="submit" value="Katso uusi lappu" />
+    {% else %}
+    <input type="submit" value="Katso lappusi uudestaan" />
+    {% endif %}
+</form>
+
+<br />
+<form method="post">
+    <label for="word">Lisää sana:</label>
+    <br />
+    <input id="word" type="text" name="word" placeholder="Sana" />
+    <input type="submit" value="Lisää" />
+</form>
+<br />
+
+<form action="/">
+    <input type="submit" value="Takaisin etusivulle" />
+</form>
+{% if session.uuid != config.admin_uuid %}
+<form method="post">
+    <input name="be_admin" type="submit" value="Ole GM" />
+</form>
+{% else %}
+<!-- Admin area -->
+<h2 style="margin-bottom: 10px; margin-top: 5px">GMAlue</h2>
+
+{% if session.confirm %}
+<p style="margin-bottom: 0px">{{session.confirm_message}}</p>
+<form method="post">
+    <div class="confirm-buttons">
+        <input type="submit" class="red" name="confirm" value="Varmista" />
+        <input type="submit" name="cancel" value="Peruuta" />
+    </div>
+</form>
+<br />
+{% endif %}
+
+<form method="post">
+    <label for="players">Pelaajien määrä:</label>
+    <br />
+    <input id="players" type="number" name="players" value="{{config.players}}" placeholder="Pelaajien määrä" />
+    <input type="submit" value="Muuta" />
+    <br />
+    <br />
+
+    {% if words | length > 0 %}
+    <input type="submit" name="next_word" value="Seuraava sana" />
+    {% else %}
+    <input type="submit" name="next_word" value="Seuraava sana" disabled />
+    {% endif %}
+
+    <input name="unbe_admin" type="submit" value="Älä ole GM" />
+    <input type="submit" name="clear" class="red" value="POISTA KAIKKI SANAT" {% if no_words and words | length==0 %}
+        disabled {% endif %} />
+    <input name="delete_room" type="submit" class="red" value="POISTA HUONE" />
+</form>
+{% endif %}
+
+{% endblock %}
