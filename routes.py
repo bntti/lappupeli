@@ -48,7 +48,7 @@ def get_word() -> str:
         return config["current_word"]
     if dts.get_player_list_size() == 0:
         return "Ei lappuja jäljellä"
-    if dts.get_player_list_size() - dts.get_seen_count() == 0:
+    if dts.get_player_list_size() == dts.get_seen_count():
         return f"Lappuja on jo jaettu {config['players']} kpl"
 
     dts.give_word(session["uuid"])
@@ -78,18 +78,34 @@ def index_get() -> str:
 @app.route("/", methods=["POST"])
 def index_post() -> str:
     check_uuid()
+
+    # User
     if request.form.get("word"):
         dts.add_word(request.form.get("word"), session["uuid"])
     if request.form.get("players"):
         dts.set_players(int(request.form.get("players")))
     if request.form.get("be_admin"):
         dts.set_admin_uuid(session["uuid"])
+
+    # Admin
     if request.form.get("unbe_admin") and check_admin():
         dts.set_admin_uuid(None)
     if request.form.get("next_word") and check_admin():
-        next_word()
+        if dts.get_player_list_size() != dts.get_seen_count() and not session.get("confirm_next_word"):
+            session["confirm_next_word"] = True
+        else:
+            next_word()
+            session["confirm_next_word"] = False
+    if request.form.get("cancel"):
+        session["confirm_clear"] = False
+        session["confirm_next_word"] = False
     if request.form.get("clear") and check_admin():
-        clear()
+        if not session.get("confirm_clear"):
+            session["confirm_clear"] = True
+        else:
+            clear()
+            session["confirm_clear"] = False
+
     return index_get()
 
 

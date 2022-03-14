@@ -58,7 +58,13 @@
 
 {% if words | length > 0 %}
 <form method="post">
-    <input type="submit" name="next_word" value="Seuraava sana" />
+    {% if session.confirm_next_word %}
+    <p style="margin-bottom:0px">Kaikki eivät ole vielä lukeneet lappujaan, haluatko silti seuraavan sanan?</p>
+    {% endif %}
+    <input id="next_word" type="submit" name="next_word" value="Seuraava sana" />
+    {% if session.confirm_next_word %}
+    <input type="submit" name="cancel" value="Peruuta" />
+    {% endif %}
 </form>
 {% else %}
 <button disabled>Seuraava sana</button>
@@ -73,7 +79,16 @@
 
 <form method="post">
     <input name="unbe_admin" type="submit" value="Älä ole GM" />
-    <input type="submit" name="clear" class="red" value="POISTA KAIKKI SANAT" />
+
+    <br />
+    {% if session.confirm_clear %}
+    <p style="margin-bottom:0px">Haluatko varmasti poistaa kaikki sanat?</p>
+    {% endif %}
+    <input id="clear" type="submit" name="clear" class="red" value="POISTA KAIKKI SANAT" {% if no_words and words |
+        length==0 %} disabled {% endif %} />
+    {% if session.confirm_clear %}
+    <input type="submit" name="cancel" value="Peruuta" />
+    {% endif %}
 </form>
 {% endif %}
 

@@ -74,6 +74,11 @@ td {
   color: red !important;
   border-color: red !important;
 }
+.red:disabled {
+  color: #faa !important;
+  border-color: #faa !important;
+  background-color: #fee !important;
+}
 .red:hover {
   background-color: #fee !important;
 }
