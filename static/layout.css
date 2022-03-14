@@ -1,4 +1,4 @@
-/* ---------- General ---------- */
+/* ---------- Global styles ---------- */
 h1 {
   margin-top: 0px;
 }
@@ -55,61 +55,10 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-/* ---------- Layoyt ---------- */
+/* ---------- Layout.html ---------- */
 .content {
   max-width: 25em;
   margin: auto;
   padding: 30px;
   padding-top: 20px;
-}
-
-/* ---------- Index ---------- */
-.table-container {
-  border-style: solid;
-  border-radius: 5px;
-  border-width: 2px;
-  margin-bottom: 5px;
-  overflow: hidden;
-  border-color: #77f;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-tr:nth-child(even) {
-  background-color: #ddf;
-}
-td {
-  padding: 10px;
-}
-td:nth-child(1) {
-  min-width: 140px;
-}
-td:nth-child(2) {
-  text-align: right;
-}
-
-.red,
-.red a {
-  color: red !important;
-  border-color: red !important;
-}
-.red:disabled {
-  color: #faa !important;
-  border-color: #faa !important;
-  background-color: #fee !important;
-}
-.red:hover {
-  background-color: #fee !important;
-}
-
-/* ---------- Word ---------- */
-.word {
-  border-style: solid;
-  border-radius: 5px;
-  border-width: 2px;
-  padding: 20px;
-  border-color: blue;
-  width: calc(100% - 44px);
-  margin-bottom: 5px;
 }
