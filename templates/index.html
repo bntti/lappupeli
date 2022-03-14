@@ -28,54 +28,61 @@
         </tbody>
     </table>
 </div>
-<button style="margin-top: 0px"><a href="/">Päivitä sivu</a></button>
+<form action="/">
+    <input type="submit" value="Päivitä sivu" />
+</form>
+
+<form action="/word">
+    {% if no_words %}
+    <input type="submit" disabled value="Peliä ei ole vielä aloitettu" />
+    {% elif new %}
+    <input type="submit" value="Katso uusi lappu" />
+    {% else %}
+    <input type="submit" value="Katso lappusi uudestaan" />
+    {% endif %}
+</form>
 
 <br />
-
-{% if no_words %}
-<button disabled>Peliä ei ole vielä aloitettu</button>
-{% elif new %}
-<button><a href="/word">Katso uusi lappu</a></button>
-{% else %}
-<button><a href="/word">Katso lappusi uudestaan</a></button>
-{% endif %}
-
 <form method="post">
     <label for="word">Lisää sana:</label>
     <br />
     <input id="word" type="text" name="word" placeholder="Sana" />
     <input type="submit" value="Lisää" />
 </form>
-
-<hr />
+<br />
 
 {% if session.uuid != config.admin_uuid %}
 <form method="post">
     <input name="be_admin" type="submit" value="Ole GM" />
 </form>
 {% else %}
-<h3 style="margin-bottom:10px">GMAlue</h3>
+<!-- Admin area -->
+<h2 style="margin-bottom: 10px; margin-top: 5px">GMAlue</h2>
 
-{% if words | length > 0 %}
 <form method="post">
     {% if session.confirm_next_word %}
     <p style="margin-bottom:0px">Kaikki eivät ole vielä lukeneet lappujaan, haluatko silti seuraavan sanan?</p>
     {% endif %}
-    <input id="next_word" type="submit" name="next_word" value="Seuraava sana" />
+
+    {% if words | length > 0 %}
+    <input type="submit" name="next_word" value="Seuraava sana" />
+    {% else %}
+    <input type="submit" name="next_word" value="Seuraava sana" disabled />
+    {% endif %}
+
     {% if session.confirm_next_word %}
     <input type="submit" name="cancel" value="Peruuta" />
     {% endif %}
 </form>
-{% else %}
-<button disabled>Seuraava sana</button>
-{% endif %}
 
+<br />
 <form method="post">
     <label for="players">Pelaajien määrä:</label>
     <br />
     <input id="players" type="number" name="players" value="{{config.players}}" placeholder="Pelaajien määrä" />
     <input type="submit" value="Muuta" />
 </form>
+<br />
 
 <form method="post">
     <input name="unbe_admin" type="submit" value="Älä ole GM" />
