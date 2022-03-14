@@ -49,21 +49,25 @@
 <form method="post">
     <label for="word">Lisää sana:</label>
     <br />
-    <input id="word" type="text" name="word" placeholder="Sana" />
-    <input type="submit" value="Lisää" />
+    <div class="input-container">
+        <input id="word" type="text" name="word" placeholder="Sana" />
+        <input type="submit" value="Lisää" />
+    </div>
 </form>
-<br />
 
 <form action="/">
     <input type="submit" value="Takaisin etusivulle" />
 </form>
+
+
+<!-- Admin area / button to get admin -->
 {% if session.uuid != config.admin_uuid %}
+<br />
 <form method="post">
     <input name="be_admin" type="submit" value="Ole GM" />
 </form>
 {% else %}
-<!-- Admin area -->
-<h2 style="margin-bottom: 10px; margin-top: 5px">GMAlue</h2>
+<h2 style="margin-bottom: 10px">GMAlue</h2>
 
 {% if session.confirm %}
 <p style="margin-bottom: 0px">{{session.confirm_message}}</p>
@@ -79,10 +83,10 @@
 <form method="post">
     <label for="players">Pelaajien määrä:</label>
     <br />
-    <input id="players" type="number" name="players" value="{{config.players}}" placeholder="Pelaajien määrä" />
-    <input type="submit" value="Muuta" />
-    <br />
-    <br />
+    <div class="input-container">
+        <input id="players" type="number" name="players" value="{{config.players}}" placeholder="Pelaajien määrä" />
+        <input type="submit" value="Muuta" />
+    </div>
 
     {% if words | length > 0 %}
     <input type="submit" name="next_word" value="Seuraava sana" />
@@ -90,6 +94,8 @@
     <input type="submit" name="next_word" value="Seuraava sana" disabled />
     {% endif %}
 
+    <br />
+    <br />
     <input name="unbe_admin" type="submit" value="Älä ole GM" />
     <input type="submit" name="clear" class="red" value="POISTA KAIKKI SANAT" {% if no_words and words | length==0 %}
         disabled {% endif %} />

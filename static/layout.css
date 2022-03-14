@@ -3,6 +3,12 @@ h1 {
   margin-top: 0px;
 }
 
+.input-container {
+  display: grid;
+  grid-template-columns: calc(66% - 3px) calc(34% - 2px);
+  column-gap: 5px;
+}
+
 .table-container {
   border-style: solid;
   border-radius: 5px;
