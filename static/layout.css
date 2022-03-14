@@ -18,29 +18,40 @@ button {
   width: 100%;
   height: 40px;
 }
-
 input[type="number"],
 input[type="text"] {
   width: calc(100% - 14px);
   height: calc(40px - 10px);
 }
-button,
-input[type="submit"] {
+
+/* Normal button */
+button:not(.red),
+input[type="submit"]:not(.red) {
   color: blue;
 }
-button:hover,
-input[type="submit"]:hover {
+button:hover:not(.red),
+input[type="submit"]:hover:not(.red) {
   background-color: #eef;
 }
-button:disabled,
-input[type="submit"]:disabled {
+button:disabled:not(.red),
+input[type="submit"]:disabled:not(.red) {
   color: #aaf !important;
   border-color: #aaf !important;
   background-color: #eef !important;
 }
-button:disabled:hover,
-input[type="submit"]:disabled:hover {
-  background-color: #eef !important;
+
+/* Red button */
+.red {
+  color: red !important;
+  border-color: red !important;
+}
+.red:hover {
+  background-color: #fee !important;
+}
+.red:disabled {
+  color: #faa !important;
+  border-color: #faa !important;
+  background-color: #fee !important;
 }
 
 /* Hide up and down buttons from number input */
