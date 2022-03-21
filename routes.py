@@ -49,15 +49,19 @@ def get_word(room_id: int) -> str:
     if dts.has_word(room_id, session["username"]):
         return dts.get_word(room_id, session["username"])
     if session["username"] == config["suggester_username"]:
-        dts.add_suggester_to_player_list(
+        dts.add_to_player_list(
             room_id, config["current_word"], config["suggester_username"]
         )
         return config["current_word"]
     if dts.get_player_list_size(room_id) == 0:
-        return "Ei lappuja jäljellä"
+        return "Peli ei ole vielä alkanut"
     if dts.get_player_list_size(room_id) == dts.get_seen_count(room_id):
         if dts.get_seen_count(room_id) != config['player_count']:
-            return f"On tapahtunut virhe, kerro Bntille kierroksen jälkeen. Tässä on silti sana: {config['current_word']}"
+            # The suggester left the game (hopefully)
+            dts.add_to_player_list(
+                room_id, config["current_word"], session["username"]
+            )
+            return config["current_word"]
         return f"Lappuja on jo jaettu {config['player_count']} kpl"
 
     dts.give_word(room_id, session["username"])

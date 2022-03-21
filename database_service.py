@@ -117,11 +117,11 @@ def add_to_player_list(room_id: int, word: str) -> None:
     database.session.commit()
 
 
-def add_suggester_to_player_list(room_id: int, word: str, suggester_username: str) -> None:
-    sql = "INSERT INTO player_words (room_id, word, assigned_to) VALUES (:room_id, :word, :suggester_username)"
+def add_to_player_list(room_id: int, word: str, username: str) -> None:
+    sql = "INSERT INTO player_words (room_id, word, assigned_to) VALUES (:room_id, :word, :username)"
     database.session.execute(
         sql,
-        {"room_id": room_id, "word": word, "suggester_username": suggester_username}
+        {"room_id": room_id, "word": word, "username": username}
     )
     database.session.commit()
 
