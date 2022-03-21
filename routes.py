@@ -37,6 +37,8 @@ def next_word(room_id: int) -> None:
 
     for _ in range(player_count - 2):
         dts.add_to_player_list(room_id, next_word)
+    if not suggester_username:
+        dts.add_to_player_list(room_id, next_word)
     dts.add_to_player_list(room_id, EMPTY)
     dts.next_word(room_id, next_word, suggester_username)
 
