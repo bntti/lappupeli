@@ -105,7 +105,8 @@ body {
 }
 
 .content {
-  min-height: calc(100vh - 50px - 138px - 3px);
+  padding-bottom: 20px;
+  min-height: calc(100vh - 60px - 148px - 3px);
 }
 
 .footer {
