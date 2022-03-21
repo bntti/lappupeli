@@ -35,7 +35,7 @@
     <input type="submit" value="Päivitä sivu" />
 </form>
 
-<form action="/room/{{room_name | urlencode}}/word">
+<form class="word" action="/room/{{room_name | urlencode}}/word">
     {% if no_words %}
     <input type="submit" disabled value="Peliä ei ole vielä aloitettu" />
     {% elif new %}
