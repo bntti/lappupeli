@@ -117,7 +117,7 @@ def add_to_player_list(room_id: int, word: str) -> None:
     database.session.commit()
 
 
-def add_to_player_list(room_id: int, word: str, username: str) -> None:
+def add_seen_to_player_list(room_id: int, word: str, username: str) -> None:
     sql = "INSERT INTO player_words (room_id, word, assigned_to) VALUES (:room_id, :word, :username)"
     database.session.execute(
         sql,
