@@ -3,6 +3,10 @@ h1 {
   margin-top: 0px;
 }
 
+strong {
+  color: blue;
+}
+
 .input-container {
   display: grid;
   grid-template-columns: calc(66% - 3px) calc(34% - 2px);
@@ -93,9 +97,24 @@ input[type="number"] {
 }
 
 /* ---------- Layout.html ---------- */
-.content {
+body {
   max-width: 25em;
   margin: auto;
   padding: 30px;
   padding-top: 20px;
+}
+
+.content {
+  min-height: calc(100vh - 50px - 138px - 3px);
+}
+
+.footer {
+  padding: 10px;
+  background-color: #eef;
+  border-radius: 5px;
+  height: 118px;
+}
+.footer p {
+  margin: 3px 0px;
+  text-align: center;
 }

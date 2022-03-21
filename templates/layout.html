@@ -12,6 +12,18 @@
     <div class="content">
         {% block content %}{% endblock %}
     </div>
+
+    {% if session.username and not error %}
+    <div class="footer">
+        <p>{{session.username}}</p>
+        <form action="/logout">
+            <input type="submit" value="Kirjaudu ulos" />
+        </form>
+        <form action="/">
+            <input type="submit" value="Takaisin etusivulle" />
+        </form>
+    </div>
+    {% endif %}
 </body>
 
 </html>

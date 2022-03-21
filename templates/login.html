@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1>Kirjaudu sisään</h1>
+
+<form method="post" action="/login">
+    <label for="username">Käyttäjänimi:</label>
+    <br />
+    <div class="input-container">
+        <input id="username" type="text" name="username" placeholder="Käyttäjänimi" />
+        <input type="submit" value="Kirjaudu sisään" />
+    </div>
+</form>
+
+{% endblock %}

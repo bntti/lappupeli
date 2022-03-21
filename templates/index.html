@@ -23,7 +23,7 @@
             {% for room in rooms %}
             <tr class="room">
                 <td><a href="/room/{{room.name | urlencode}}">{{room.name}}</a></td>
-                <td><a href="/room/{{room.name | urlencode}}">{{room.players}}</a></td>
+                <td><a href="/room/{{room.name | urlencode}}">{{room.player_count}}</a></td>
             </tr>
             {% endfor %}
         </tbody>

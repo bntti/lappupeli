@@ -18,7 +18,7 @@
             </tr>
             <tr>
                 <td>Pelaajien määrä</td>
-                <td>{{config.players}}</td>
+                <td>{{config.player_count}}</td>
             </tr>
             <tr>
                 <td>Edellinen sana</td>
@@ -55,14 +55,15 @@
     </div>
 </form>
 
-<form action="/">
-    <input type="submit" value="Takaisin etusivulle" />
-</form>
-
 
 <!-- Admin area / button to get admin -->
-{% if session.uuid != config.admin_uuid %}
+{% if session.username != config.admin_username %}
 <br />
+{% if config.admin_username %}
+Tämänhetkinen GM on <strong>{{config.admin_username}}</strong>
+{% else %}
+Kukaan ei ole GM
+{% endif %}
 <form method="post">
     <input name="be_admin" type="submit" value="Ole GM" />
 </form>
@@ -83,10 +84,11 @@
 {% endif %}
 
 <form method="post">
-    <label for="players">Pelaajien määrä:</label>
+    <label for="player_count">Pelaajien määrä:</label>
     <br />
     <div class="input-container">
-        <input id="players" type="number" name="players" value="{{config.players}}" placeholder="Pelaajien määrä" />
+        <input id="player_count" type="number" name="player_count" value="{{config.player_count}}"
+            placeholder="Pelaajien määrä" />
         <input type="submit" value="Muuta" />
     </div>
 
