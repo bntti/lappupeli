@@ -19,10 +19,10 @@ def get_room_id(room_name: str) -> Optional[int]:
     return result[0] if result else None
 
 
-def get_rooms() -> list[dict]:
-    sql = "SELECT name, player_count FROM rooms"
+def get_rooms() -> list[str]:
+    sql = "SELECT name FROM rooms"
     result = database.session.execute(sql).fetchall()
-    return [{"name": row[0], "player_count": row[1]} for row in result]
+    return [row[0] for row in result]
 
 
 def add_room(room_name: str) -> None:
@@ -36,30 +36,14 @@ def add_room(room_name: str) -> None:
         database.session.rollback()
 
 
-def delete_room(room_id: int) -> None:
-    sql = "DELETE FROM rooms WHERE id = :room_id"
-    database.session.execute(sql, {"room_id": room_id})
-    database.session.commit()
-
-
 def get_config(room_id: int) -> dict:
-    sql = "SELECT suggester_username, current_word, previous_word, player_count, admin_username FROM rooms WHERE id = :room_id"
+    sql = "SELECT current_word, previous_word, admin_username FROM rooms WHERE id = :room_id"
     row = database.session.execute(sql, {"room_id": room_id}).fetchone()
     return {
-        "suggester_username": row[0],
-        "current_word": row[1],
-        "previous_word": row[2],
-        "player_count": row[3],
-        "admin_username": row[4]
+        "current_word": row[0],
+        "previous_word": row[1],
+        "admin_username": row[2]
     }
-
-
-def set_player_count(room_id: int, player_count: int) -> None:
-    sql = "UPDATE rooms SET player_count = :player_count WHERE id = :room_id"
-    database.session.execute(
-        sql, {"room_id": room_id, "player_count": player_count}
-    )
-    database.session.commit()
 
 
 def set_admin(room_id: int, admin_username: str) -> None:
@@ -67,4 +51,24 @@ def set_admin(room_id: int, admin_username: str) -> None:
     database.session.execute(
         sql, {"room_id": room_id, "admin_username": admin_username}
     )
+    database.session.commit()
+
+
+def set_current_word(room_id: int, word: str) -> None:
+    sql = "UPDATE rooms SET current_word = :word WHERE id = :room_id"
+    database.session.execute(
+        sql, {"room_id": room_id, "word": word}
+    )
+    database.session.commit()
+
+
+def update_previous_word(room_id: int) -> None:
+    sql = "UPDATE rooms SET previous_word = current_word WHERE id = :room_id"
+    database.session.execute(sql, {"room_id": room_id})
+    database.session.commit()
+
+
+def delete_room(room_id: int) -> None:
+    sql = "DELETE FROM rooms WHERE id = :room_id"
+    database.session.execute(sql, {"room_id": room_id})
     database.session.commit()

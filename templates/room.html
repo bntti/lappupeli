@@ -8,17 +8,26 @@
 <div class="table-container">
     <table>
         <tbody>
+            {% if not in_game %}
             <tr>
                 <td>Sanojen määrä</td>
-                <td>{{words | length}}</td>
+                <td>{{word_count}}</td>
             </tr>
+            {% endif %}
+            {% if round_in_progress %}
             <tr>
                 <td>Lapun lukeneet</td>
                 <td>{{seen_count}}</td>
             </tr>
+            {% endif %}
             <tr>
+                {% if round_in_progress %}
                 <td>Pelaajien määrä</td>
-                <td>{{config.player_count}}</td>
+                <td>{{seen_count}}</td>
+                {% else %}
+                <td>Valmiiden pelaajien määrä</td>
+                <td>{{ready_player_count}}</td>
+                {% endif %}
             </tr>
             <tr>
                 <td>Edellinen sana</td>
@@ -31,19 +40,33 @@
         </tbody>
     </table>
 </div>
+
+<!-- We hopefully won't need this in the future -->
 <form action="/room/{{room_name | urlencode}}">
     <input type="submit" value="Päivitä sivu" />
 </form>
 
-<form class="word" action="/room/{{room_name | urlencode}}/word">
-    {% if no_words %}
-    <input type="submit" disabled value="Peliä ei ole vielä aloitettu" />
-    {% elif new %}
+{% if round_in_progress %}
+<form class="main-action" action="/room/{{room_name | urlencode}}/word">
+    {% if in_game and not seen %}
     <input type="submit" value="Katso uusi lappu" />
+    {% elif in_game %}
+    <input type="submit" value="Katso lappusi" />
     {% else %}
-    <input type="submit" value="Katso lappusi uudestaan" />
+    <input type="submit" disabled value="Et ole kierroksella mukana" />
     {% endif %}
 </form>
+{% else %}
+<form class="main-action" method="post">
+    {% if word_count == 0 %}
+    <input type="submit" disabled value="Sanoja ei ole" />
+    {% elif not ready %}
+    <input type="submit" name="be_ready" value="Liity seuraavaan kierrokseen" />
+    {% else %}
+    <input class="red" type="submit" name="unbe_ready" value="Poistu seuraavaasta kierroksesta" />
+    {% endif %}
+</form>
+{% endif %}
 
 <br />
 <form method="post">
@@ -84,25 +107,17 @@ Kukaan ei ole GM
 {% endif %}
 
 <form method="post">
-    <label for="player_count">Pelaajien määrä:</label>
-    <br />
-    <div class="input-container">
-        <input id="player_count" type="number" name="player_count" value="{{config.player_count}}"
-            placeholder="Pelaajien määrä" />
-        <input type="submit" value="Muuta" />
-    </div>
-
-    {% if words | length > 0 %}
-    <input type="submit" name="next_word" value="Seuraava sana" />
+    {% if round_in_progress %}
+    <input type="submit" name="end_round" value="Lopeta kierros" />
+    {% elif word_count > 0 and ready_player_count >= 2 %}
+    <input type="submit" name="start_round" value="Aloita kierros" />
     {% else %}
-    <input type="submit" name="next_word" value="Seuraava sana" disabled />
+    <input type="submit" value="Aloita kierros" disabled />
     {% endif %}
 
-    <br />
-    <br />
     <input name="unbe_admin" type="submit" value="Älä ole GM" />
-    <input type="submit" name="clear" class="red" value="POISTA KAIKKI SANAT" {% if no_words and words | length==0 %}
-        disabled {% endif %} />
+    <input type="submit" name="reset_room" class="red" value="POISTA KAIKKI SANAT" {% if no_words and words | length==0
+        %} disabled {% endif %} />
     <input name="delete_room" type="submit" class="red" value="POISTA HUONE" />
 </form>
 {% endif %}

@@ -6,12 +6,12 @@
 
 <h1>Lappupeli</h1>
 
+<h3>Valitse huone tai luo uusi huone</h3>
 <div class="table-container">
     <table>
         <thead>
             <tr>
                 <th>Huoneen nimi</th>
-                <th>Pelaajien määrä</th>
             </tr>
         </thead>
         <tbody>
@@ -20,10 +20,9 @@
                 <td>Ei huoneita</td>
             </tr>
             {% endif %}
-            {% for room in rooms %}
+            {% for room_name in rooms %}
             <tr class="room">
-                <td><a href="/room/{{room.name | urlencode}}">{{room.name}}</a></td>
-                <td><a href="/room/{{room.name | urlencode}}">{{room.player_count}}</a></td>
+                <td><a href="/room/{{room_name | urlencode}}">{{room_name}}</a></td>
             </tr>
             {% endfor %}
         </tbody>
