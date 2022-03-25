@@ -1,6 +1,7 @@
 from database import database
 
 
+# Service functions
 def get_card(room_id: int, username: str) -> str:
     if get_card_count(room_id) == 0:
         return "Kierros on loppunut / ei ole vielä alkanut"
@@ -12,6 +13,7 @@ def get_card(room_id: int, username: str) -> str:
     return card
 
 
+# Database functions
 def add_card(room_id: int, word: str, username: str) -> None:
     sql = "INSERT INTO cards (room_id, word, assigned_to) VALUES (:room_id, :word, :username)"
     database.session.execute(

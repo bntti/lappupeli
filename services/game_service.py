@@ -1,5 +1,5 @@
 import random
-from flask import abort
+from flask import abort, session
 from database import database
 import services.card_service as card_service
 import services.room_service as room_service
@@ -9,14 +9,20 @@ import services.ready_players_service as rps
 EMPTY_CARD = "Sait tyhjän lapun!"
 
 
-# Normal functions
+# Service functions
+def check_user() -> str:
+    if "username" not in session:
+        abort(401)
+    return session["username"]
+
+
 def start_round(room_id: int) -> None:
     words = word_service.get_words(room_id)
     ready_players = rps.get_ready_players(room_id)
     ready_count = len(ready_players)
 
-    if len(words) == 0 or ready_count < 2 or ready_count > 100:
-        abort(400, "Sanamäärän pitää olla yli 0 ja pelaajamäärän pitää olla vähintään 2 ja enintään 100")
+    if len(words) == 0 or not 2 <= ready_count <= 64:
+        abort(400, "Sanamäärän pitää olla yli 0 ja pelaajamäärän pitää olla vähintään 2 ja enintään 64")
 
     r = random.randint(1, 10)
     if r == 1:

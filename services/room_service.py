@@ -5,11 +5,21 @@ from psycopg2.errors import UniqueViolation
 from database import database
 
 
+# Service functions
 def check_room(room_name: str) -> int:
     room_id = get_room_id(room_name)
     if not room_id:
         abort(404, f"Ei huonetta nimellä {room_name}")
     return room_id
+
+
+def add_room(room_name: str) -> None:
+    if 0 < len(room_name) <= 32:
+        db_add_room(room_name)
+    else:
+        abort(
+            400, "Huoneen nimi ei saa olla tyhjä ja sen pituus saa olla enintään 32 merkkiä"
+        )
 
 
 # Database functions
@@ -25,7 +35,7 @@ def get_rooms() -> list[str]:
     return [row[0] for row in result]
 
 
-def add_room(room_name: str) -> None:
+def db_add_room(room_name: str) -> None:
     try:
         sql = "INSERT INTO rooms (name) VALUES (:room_name)"
         database.session.execute(sql, {"room_name": room_name})

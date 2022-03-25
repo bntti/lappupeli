@@ -1,7 +1,7 @@
 from typing import Union
 import urllib.parse
 from markupsafe import Markup
-from werkzeug.exceptions import NotFound, Unauthorized
+from werkzeug.exceptions import NotFound, Unauthorized, BadRequest
 from flask import Response, abort, redirect, render_template, request, session
 from app import app
 import services.card_service as card_service
@@ -11,22 +11,20 @@ import services.game_service as game_service
 import services.ready_players_service as rps
 
 
-def check_user() -> str:
-    if "username" not in session:
-        abort(401)
-    return session["username"]
+# Error handlers
+@app.errorhandler(400)
+def page_not_found(error: BadRequest) -> tuple[str, int]:
+    return render_template('error.html', error=error.description), 400
 
 
-# 404 Error handler
-@app.errorhandler(404)
-def page_not_found(error: NotFound) -> tuple[str, int]:
-    return render_template('error.html', error=error.description), 404
-
-
-# 401 Error handler
 @app.errorhandler(401)
 def unauthorized(_: Unauthorized) -> tuple[str, int]:
     return render_template('login.html'), 401
+
+
+@app.errorhandler(404)
+def page_not_found(error: NotFound) -> tuple[str, int]:
+    return render_template('error.html', error=error.description), 404
 
 
 # Url encoder
@@ -42,7 +40,7 @@ def url_encode(string: str) -> Markup:
 # Routes
 @app.route("/", methods=["GET"])
 def index_get() -> Union[str, Response]:
-    username = check_user()
+    username = game_service.check_user()
     session["confirm"] = None
     rps.set_player_to_not_ready(username)
     return render_template("index.html", rooms=room_service.get_rooms())
@@ -50,15 +48,15 @@ def index_get() -> Union[str, Response]:
 
 @app.route("/", methods=["POST"])
 def index_post() -> str:
-    check_user()
-    room_name = request.form.get("room_name")
-    room_service.add_room(room_name)
+    game_service.check_user()
+    if request.form.get("room_name"):
+        room_service.add_room(request.form.get("room_name"))
     return index_get()
 
 
 @app.route("/room/<path:room_name>", methods=["GET"])
 def room_get(room_name: str) -> str:
-    username = check_user()
+    username = game_service.check_user()
     room_id = room_service.check_room(room_name)
     return render_template(
         "room.html",
@@ -77,7 +75,7 @@ def room_get(room_name: str) -> str:
 
 @app.route("/room/<path:room_name>", methods=["POST"])
 def room_post(room_name: str) -> Union[str, Response]:
-    username = check_user()
+    username = game_service.check_user()
     room_id = room_service.check_room(room_name)
 
     # User
@@ -96,7 +94,10 @@ def room_post(room_name: str) -> Union[str, Response]:
 
     if request.form.get("unbe_admin"):
         room_service.set_admin(room_id, None)
+    if request.form.get("start_round"):
+        game_service.start_round(room_id)
 
+    # Confirm and cancel
     if request.form.get("cancel"):
         session["confirm"] = None
     if request.form.get("confirm"):
@@ -110,8 +111,7 @@ def room_post(room_name: str) -> Union[str, Response]:
             game_service.end_round(room_id)
         session["confirm"] = None
 
-    if request.form.get("start_round"):
-        game_service.start_round(room_id)
+    # Actions that (might) require confirmation
     if request.form.get("end_round"):
         if card_service.get_seen_card_count(room_id) != card_service.get_card_count(room_id):
             session["confirm"] = "confirm_end_round"
@@ -130,19 +130,22 @@ def room_post(room_name: str) -> Union[str, Response]:
 
 @app.route("/room/<path:room_name>/word")
 def word(room_name: str) -> str:
-    username = check_user()
+    username = game_service.check_user()
     room_id = room_service.check_room(room_name)
     return render_template("word.html", room_name=room_name, word=card_service.get_card(room_id, username))
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login() -> Union[str, Response]:
-    if request.method == "POST":
-        if request.form.get("username"):
-            username = request.form.get("username")
-            if 0 < len(username) <= 64:
-                session["username"] = username
-                return redirect('/')
+    if request.method == "POST" and request.form.get("username"):
+        username = request.form.get("username")
+        if 0 < len(username) <= 32:
+            session["username"] = username
+            return redirect('/')
+        else:
+            abort(
+                400, "Käyttäjänimi ei saa olla tyhjä ja sen pituus saa olla enintään 32 merkkiä"
+            )
     return render_template("login.html")
 
 
