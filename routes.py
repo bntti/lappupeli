@@ -60,7 +60,6 @@ def index_post() -> str:
 def room_get(room_name: str) -> str:
     username = check_user()
     room_id = room_service.check_room(room_name)
-    print(card_service.get_card_count(room_id))
     return render_template(
         "room.html",
         in_game=card_service.has_card(room_id, username),
