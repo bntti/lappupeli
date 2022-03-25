@@ -56,9 +56,10 @@ def give_card(room_id: int, username: str) -> None:
 
 
 # Database functions
-def reset_game(room_id: int) -> None:
+def reset_room(room_id: int) -> None:
     sql = "DELETE FROM words WHERE room_id = :room_id;"\
           "DELETE FROM cards WHERE room_id = :room_id;"\
+          "DELETE FROM ready_players WHERE room_id = :room_id;"\
           "UPDATE rooms SET previous_word = NULL, current_word = NULL WHERE id = :room_id"
     database.session.execute(sql, {"room_id": room_id})
     database.session.commit()

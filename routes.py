@@ -105,7 +105,7 @@ def room_post(room_name: str) -> Union[str, Response]:
             session["confirm"] = None
             return redirect("/")
         elif session["confirm"] == "confirm_reset_room":
-            game_service.reset_game(room_id)
+            game_service.reset_room(room_id)
         elif session["confirm"] == "confirm_end_round":
             game_service.end_round(room_id)
         session["confirm"] = None
@@ -120,7 +120,7 @@ def room_post(room_name: str) -> Union[str, Response]:
             game_service.end_round(room_id)
     if request.form.get("reset_room"):
         session["confirm"] = "confirm_reset_room"
-        session["confirm_message"] = "Haluatko varmasti poistaa kaikki sanat?"
+        session["confirm_message"] = "Haluatko varmasti nollata huoneen?"
     if request.form.get("delete_room"):
         session["confirm"] = "confirm_delete_room"
         session["confirm_message"] = "Haluatko varmasti poistaa huoneen?"
