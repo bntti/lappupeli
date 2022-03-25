@@ -56,7 +56,7 @@ def get_config(room_id: int) -> dict:
     }
 
 
-def set_admin(room_id: int, admin_username: str) -> None:
+def set_admin(room_id: int, admin_username: Optional[str]) -> None:
     sql = "UPDATE rooms SET admin_username = :admin_username WHERE id = :room_id"
     database.session.execute(
         sql, {"room_id": room_id, "admin_username": admin_username}

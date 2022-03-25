@@ -42,7 +42,7 @@ def db_add_word(room_id: int, word: str, suggester_username: str) -> None:
         database.session.rollback()
 
 
-def remove_word(room_id: int, word: str) -> str:
+def remove_word(room_id: int, word: str) -> None:
     sql = "DELETE FROM words WHERE room_id = :room_id AND word = :word"
     database.session.execute(sql, {"room_id": room_id, "word": word})
     database.session.commit()
