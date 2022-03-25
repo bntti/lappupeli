@@ -48,13 +48,6 @@ def end_round(room_id: int) -> None:
     room_service.update_previous_word(room_id)
 
 
-def give_card(room_id: int, username: str) -> None:
-    sql = "UPDATE cards SET assigned_to = :username WHERE room_id = :room_id " \
-          "AND id = (SELECT id FROM cards WHERE room_id = :room_id AND assigned_to IS NULL ORDER BY random() LIMIT 1)"
-    database.session.execute(sql, {"room_id": room_id, "username": username})
-    database.session.commit()
-
-
 # Database functions
 def reset_room(room_id: int) -> None:
     sql = "DELETE FROM words WHERE room_id = :room_id;"\
