@@ -22,8 +22,9 @@ def start_round(room_id: int) -> None:
     if r == 1:
         next_word, suggester_username = (EMPTY_CARD, None)
     else:
-        next_word = words.pop()
-        suggester_username = word_service.remove_word(room_id, next_word)
+        random.shuffle(words)
+        next_word, suggester_username = words.pop()
+        word_service.remove_word(room_id, next_word)
 
     cards = [EMPTY_CARD]
     for _ in range(ready_count - 2):

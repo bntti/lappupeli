@@ -4,9 +4,9 @@ from database import database
 
 
 def get_words(room_id: int) -> list:
-    sql = "SELECT word FROM words WHERE room_id = :room_id"
+    sql = "SELECT word, suggester_username FROM words WHERE room_id = :room_id"
     result = database.session.execute(sql, {"room_id": room_id}).fetchall()
-    return [a[0] for a in result] if result else []
+    return [(row[0], row[1]) for row in result] if result else []
 
 
 def get_word_count(room_id: int) -> int:
@@ -33,7 +33,6 @@ def add_word(room_id: int, word: str, suggester_username: str) -> None:
 
 
 def remove_word(room_id: int, word: str) -> str:
-    sql = "DELETE FROM words WHERE room_id = :room_id AND word = :word RETURNING suggester_username "
-    result = database.session.execute(sql, {"room_id": room_id, "word": word})
+    sql = "DELETE FROM words WHERE room_id = :room_id AND word = :word"
+    database.session.execute(sql, {"room_id": room_id, "word": word})
     database.session.commit()
-    return result.fetchone()[0]
