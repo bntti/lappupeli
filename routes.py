@@ -68,8 +68,9 @@ def room_get(room_name: str) -> str:
         ready_player_count=rps.get_ready_player_count(room_id),
         seen=card_service.has_seen_card(room_id, username),
         seen_count=card_service.get_seen_card_count(room_id),
-        round_in_progress=card_service.get_card_count(room_id) > 0,
+        card_count=card_service.get_card_count(room_id),
         word_count=word_service.get_word_count(room_id),
+        round_in_progress=card_service.get_card_count(room_id) > 0,
         config=room_service.get_config(room_id),
         room_name=room_name
     )
