@@ -42,9 +42,7 @@
 </div>
 
 <!-- We hopefully won't need this in the future -->
-<form action="/room/{{room_name | urlencode}}">
-    <input type="submit" value="Päivitä sivu" />
-</form>
+<a href="/room/{{room_name | urlencode}}"><button>Päivitä sivu</button></a>
 
 {% if round_in_progress %}
 <form class="main-action" action="/room/{{room_name | urlencode}}/word">

@@ -6,8 +6,6 @@
 
 <h1>Lappusi</h1>
 <h2 class="word">{{word}}</h2>
-<form action="/room/{{room_name | urlencode}}">
-    <input type="submit" value="Takaisin" />
-</form>
+<a href="/room/{{room_name | urlencode}}"><button>Takaisin</button></a>
 
 {% endblock %}

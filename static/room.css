@@ -1,3 +1,13 @@
+td:nth-child(1) {
+  min-width: 140px;
+}
+td:nth-child(2) {
+  text-align: right;
+}
+tr:nth-child(even) {
+  background-color: #ddf;
+}
+
 .main-action input {
   height: 86px;
 }
@@ -15,14 +25,4 @@
   display: grid;
   column-gap: 5px;
   grid-template-columns: calc(50% - 2.5px) calc(50% - 2.5px);
-}
-
-td:nth-child(1) {
-  min-width: 140px;
-}
-td:nth-child(2) {
-  text-align: right;
-}
-tr:nth-child(even) {
-  background-color: #ddf;
 }

@@ -16,12 +16,8 @@
     {% if session.username and not error %}
     <div class="footer">
         <p>{{session.username}}</p>
-        <form action="/logout">
-            <input type="submit" value="Kirjaudu ulos" />
-        </form>
-        <form action="/">
-            <input type="submit" value="Takaisin etusivulle" />
-        </form>
+        <a href="/logout"><button>Kirjaudu ulos</button></a>
+        <a href="/"><button>Takaisin etusivulle</button></a>
     </div>
     {% endif %}
 </body>
