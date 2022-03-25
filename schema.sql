@@ -8,18 +8,21 @@ CREATE TABLE IF NOT EXISTS rooms (
 CREATE TABLE IF NOT EXISTS words (
     id SERIAL PRIMARY KEY,
     room_id INT REFERENCES rooms ON DELETE CASCADE NOT NULL,
-    word TEXT UNIQUE NOT NULL,
-    suggester_username TEXT NOT NULL
+    word TEXT NOT NULL,
+    suggester_username TEXT NOT NULL,
+    UNIQUE (room_id, word)
 );
 CREATE TABLE IF NOT EXISTS cards (
     id SERIAL PRIMARY KEY,
     room_id INT REFERENCES rooms ON DELETE CASCADE NOT NULL,
     word TEXT NOT NULL,
     assigned_to TEXT,
-    seen BOOL DEFAULT false
+    seen BOOL DEFAULT false,
+    UNIQUE (room_id, assigned_to)
 );
 CREATE TABLE IF NOT EXISTS ready_players (
     id SERIAL PRIMARY KEY,
     room_id INT REFERENCES rooms ON DELETE CASCADE NOT NULL,
-    username TEXT NOT NULL
+    username TEXT NOT NULL,
+    UNIQUE (room_id, username)
 );

@@ -1,3 +1,5 @@
+from sqlalchemy.exc import IntegrityError
+from psycopg2.errors import UniqueViolation
 from database import database
 
 
@@ -21,9 +23,16 @@ def get_ready_player_count(room_id: int) -> int:
 
 
 def set_ready(room_id: int, username: str) -> None:
-    sql = "INSERT INTO ready_players (room_id, username) VALUES (:room_id, :username)"
-    database.session.execute(sql, {"room_id": room_id, "username": username})
-    database.session.commit()
+    try:
+        sql = "INSERT INTO ready_players (room_id, username) VALUES (:room_id, :username)"
+        database.session.execute(
+            sql, {"room_id": room_id, "username": username}
+        )
+        database.session.commit()
+    except IntegrityError as error:
+        # UNIQUE constraint fail
+        assert isinstance(error.orig, UniqueViolation)
+        database.session.rollback()
 
 
 def set_not_ready(room_id: int, username: str) -> None:
