@@ -2,7 +2,7 @@ from typing import Union
 import urllib.parse
 from markupsafe import Markup
 from werkzeug.exceptions import NotFound, Unauthorized, BadRequest
-from flask import Response, abort, redirect, render_template, request, session
+from flask import Response, abort, redirect, render_template, request, session, jsonify
 from app import app
 import services.card_service as card_service
 import services.room_service as room_service
@@ -52,6 +52,20 @@ def index_post() -> str:
     if request.form.get("room_name"):
         room_service.add_room(request.form.get("room_name"))
     return index_get()
+
+
+@app.route("/room/<path:room_name>/room_data", methods=["GET"])
+def room_data_get(room_name: str) -> Response:
+    game_service.check_user()
+    room_id = room_service.check_room(room_name)
+    return jsonify({
+        "round_in_progress": card_service.get_card_count(room_id) > 0,
+        "ready_player_count": rps.get_ready_player_count(room_id),
+        "seen_count": card_service.get_seen_card_count(room_id),
+        "card_count": card_service.get_card_count(room_id),
+        "word_count": word_service.get_word_count(room_id),
+        "config": room_service.get_config(room_id)
+    })
 
 
 @app.route("/room/<path:room_name>", methods=["GET"])

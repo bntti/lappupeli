@@ -4,6 +4,49 @@
 {% endblock %}
 {% block content %}
 
+<script>
+    setInterval(() => {
+        url = '/room/{{room_name | urlencode}}/room_data';
+        fetch(url, { method: 'GET' })
+            .then((response) => response.json())
+            .then((roomData) => {
+                console.log(roomData);
+                var round_in_progress = "{{round_in_progress}}"
+                round_in_progress = round_in_progress == "True" ? true : false
+                if (round_in_progress != roomData.round_in_progress || "{{word_count}}" > roomData.word_count) {
+                    window.location = window.location.href;
+                }
+
+                // Update table
+                if ("{{not in_game}}" == "True") {
+                    document.getElementById("word_count").innerHTML = roomData.word_count;
+                }
+                if ("{{round_in_progress}}" == "True") {
+                    document.getElementById("seen_count").innerHTML = roomData.seen_count;
+                    document.getElementById("card_count").innerHTML = roomData.card_count;
+                } else {
+                    document.getElementById("ready_player_count").innerHTML = roomData.ready_player_count;
+                }
+
+                // Update join round button
+                if ("{{round_in_progress}}" == "False" && "{{word_count}}" == 0
+                    && roomData.word_count > 0) {
+                    document.getElementById("no_words").disabled = false
+                    document.getElementById("no_words").value = "Liity seuraavaan kierrokseen"
+                }
+
+                // Update start round button
+                if ("{{round_in_progress}}" == "False" && "{{session.username == config.admin_username}}" == "True") {
+                    if (roomData.word_count > 0 && roomData.ready_player_count >= 2) {
+                        document.getElementById("start_round").disabled = false
+                    } else {
+                        document.getElementById("start_round").disabled = true
+                    }
+                }
+            });
+    }, 2000);
+</script>
+
 <h1>{{room_name}}</h1>
 <div class="table-container">
     <table>
@@ -11,22 +54,22 @@
             {% if not in_game %}
             <tr>
                 <td>Sanojen määrä</td>
-                <td>{{word_count}}</td>
+                <td id="word_count">{{word_count}}</td>
             </tr>
             {% endif %}
             {% if round_in_progress %}
             <tr>
                 <td>Lapun lukeneet</td>
-                <td>{{seen_count}}</td>
+                <td id="seen_count">{{seen_count}}</td>
             </tr>
             {% endif %}
             <tr>
                 {% if round_in_progress %}
                 <td>Pelaajien määrä</td>
-                <td>{{card_count}}</td>
+                <td id="card_count">{{card_count}}</td>
                 {% else %}
                 <td>Valmiiden pelaajien määrä</td>
-                <td>{{ready_player_count}}</td>
+                <td id="ready_player_count">{{ready_player_count}}</td>
                 {% endif %}
             </tr>
             <tr>
@@ -41,9 +84,6 @@
     </table>
 </div>
 
-<!-- We hopefully won't need this in the future -->
-<a href="/room/{{room_name | urlencode}}"><button>Päivitä sivu</button></a>
-
 {% if round_in_progress %}
 <form class="main-action" action="/room/{{room_name | urlencode}}/word">
     {% if in_game and not seen %}
@@ -57,7 +97,7 @@
 {% else %}
 <form class="main-action" method="post">
     {% if word_count == 0 %}
-    <input type="submit" disabled value="Sanoja ei ole" />
+    <input id="no_words" type="submit" name="be_ready" value="Sanoja ei ole" disabled />
     {% elif not ready %}
     <input type="submit" name="be_ready" value="Liity seuraavaan kierrokseen" />
     {% else %}
@@ -108,9 +148,9 @@ Kukaan ei ole GM
     {% if round_in_progress %}
     <input type="submit" name="end_round" value="Lopeta kierros" />
     {% elif word_count > 0 and ready_player_count >= 2 %}
-    <input type="submit" name="start_round" value="Aloita kierros" />
+    <input type="submit" id="start_round" name="start_round" value="Aloita kierros" />
     {% else %}
-    <input type="submit" value="Aloita kierros" disabled />
+    <input type="submit" id="start_round" name="start_round" value="Aloita kierros" disabled />
     {% endif %}
 
     <input name="unbe_admin" type="submit" value="Älä ole GM" />
