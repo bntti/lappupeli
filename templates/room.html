@@ -57,21 +57,27 @@
                 <td id="word_count">{{word_count}}</td>
             </tr>
             {% endif %}
+
             {% if round_in_progress %}
+            <tr>
+                <td>Aloittaja</td>
+                <td>{{config.starter_username}}</td>
+            </tr>
             <tr>
                 <td>Lapun lukeneet</td>
                 <td id="seen_count">{{seen_count}}</td>
             </tr>
-            {% endif %}
             <tr>
-                {% if round_in_progress %}
                 <td>Pelaajien määrä</td>
                 <td id="card_count">{{card_count}}</td>
-                {% else %}
+            </tr>
+            {% else %}
+            <tr>
                 <td>Valmiiden pelaajien määrä</td>
                 <td id="ready_player_count">{{ready_player_count}}</td>
-                {% endif %}
             </tr>
+            {% endif %}
+
             <tr>
                 <td>Edellinen sana</td>
                 {% if config.previous_word %}

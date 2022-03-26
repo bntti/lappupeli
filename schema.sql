@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS rooms (
     name TEXT UNIQUE NOT NULL,
     current_word TEXT,
     previous_word TEXT,
-    admin_username TEXT
+    admin_username TEXT,
+    starter_username TEXT
 );
 CREATE TABLE IF NOT EXISTS words (
     id SERIAL PRIMARY KEY,

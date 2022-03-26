@@ -45,6 +45,7 @@ def start_round(room_id: int) -> None:
         else:
             card_service.add_card(room_id, cards.pop(), username)
 
+    room_service.set_starter(room_id, random.choice(ready_players))
     room_service.set_current_word(room_id, next_word)
     rps.set_room_to_not_ready(room_id)
 
