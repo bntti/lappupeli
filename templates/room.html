@@ -5,16 +5,34 @@
 {% block content %}
 
 <script>
+    const sanitize = (string) => {
+        const map = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#x27;",
+            "/": "&#x2F;",
+        };
+        const reg = /[&<>"'/]/gi;
+        return string.replace(reg, (match) => map[match]);
+    };
+
     setInterval(() => {
         url = '/room/{{room_name | urlencode}}/room_data';
         fetch(url, { method: 'GET' })
             .then((response) => response.json())
             .then((roomData) => {
-                console.log(roomData);
-                var round_in_progress = "{{round_in_progress}}"
-                round_in_progress = round_in_progress == "True" ? true : false
+                var round_in_progress = "{{round_in_progress}}";
+                round_in_progress = round_in_progress == "True" ? true : false;
+
+                // New round has started
                 if (round_in_progress != roomData.round_in_progress || "{{word_count}}" > roomData.word_count) {
                     window.location = window.location.href;
+                }
+                // Player was kicked out of the room
+                if (!round_in_progress && !roomData.in_room) {
+                    window.location = "/"
                 }
 
                 // Update table
@@ -23,24 +41,33 @@
                 }
                 if ("{{round_in_progress}}" == "True") {
                     document.getElementById("seen_count").innerHTML = roomData.seen_count;
-                    document.getElementById("card_count").innerHTML = roomData.card_count;
-                } else {
-                    document.getElementById("ready_player_count").innerHTML = roomData.ready_player_count;
                 }
+                document.getElementById("player_count").innerHTML = roomData.player_count;
 
                 // Update join round button
                 if ("{{round_in_progress}}" == "False" && "{{word_count}}" == 0
                     && roomData.word_count > 0) {
-                    document.getElementById("no_words").disabled = false
-                    document.getElementById("no_words").value = "Liity seuraavaan kierrokseen"
+                    document.getElementById("no_words").innerHTML = "Kierros ei ole vielä alkanut";
                 }
 
-                // Update start round button
-                if ("{{round_in_progress}}" == "False" && "{{session.username == config.admin_username}}" == "True") {
-                    if (roomData.word_count > 0 && roomData.ready_player_count >= 2) {
-                        document.getElementById("start_round").disabled = false
-                    } else {
-                        document.getElementById("start_round").disabled = true
+                if ("{{session.username == config.admin_username}}" == "True") {
+                    // Update players table
+                    document.getElementById("players").innerHTML = roomData.players.map(
+                        (player) => `
+                        <tr>
+                            <td>${sanitize(player)}</td>
+                            <td>
+                                <input type="submit" class="red" name="remove_player_${sanitize(player)}" value="POISTA" />
+                            </td>
+                        </tr>`).join('\n');
+
+                    // Update start round button
+                    if ("{{round_in_progress}}" == "False") {
+                        if (roomData.word_count > 0 && roomData.player_count >= 2) {
+                            document.getElementById("start_round").disabled = false;
+                        } else {
+                            document.getElementById("start_round").disabled = true;
+                        }
                     }
                 }
             });
@@ -67,16 +94,11 @@
                 <td>Lapun lukeneet</td>
                 <td id="seen_count">{{seen_count}}</td>
             </tr>
+            {% endif %}
             <tr>
                 <td>Pelaajien määrä</td>
-                <td id="card_count">{{card_count}}</td>
+                <td id="player_count">{{player_count}}</td>
             </tr>
-            {% else %}
-            <tr>
-                <td>Valmiiden pelaajien määrä</td>
-                <td id="ready_player_count">{{ready_player_count}}</td>
-            </tr>
-            {% endif %}
 
             <tr>
                 <td>Edellinen sana</td>
@@ -101,15 +123,12 @@
     {% endif %}
 </form>
 {% else %}
-<form class="main-action" method="post">
-    {% if word_count == 0 %}
-    <input id="no_words" type="submit" name="be_ready" value="Sanoja ei ole" disabled />
-    {% elif not ready %}
-    <input type="submit" name="be_ready" value="Liity seuraavaan kierrokseen" />
-    {% else %}
-    <input class="red" type="submit" name="unbe_ready" value="Poistu seuraavaasta kierroksesta" />
-    {% endif %}
-</form>
+
+{% if word_count == 0 %}<button id="no_words" disabled>Sanoja ei ole</button>
+{% else %}<button disabled>Kierros ei ole vielä alkanut</button>
+{% endif %}
+<br />
+
 {% endif %}
 
 <br />
@@ -132,7 +151,7 @@ Tämänhetkinen GM on <strong>{{config.admin_username}}</strong>
 Kukaan ei ole GM
 {% endif %}
 <form method="post">
-    <input name="be_admin" type="submit" value="Ole GM" />
+    <input type="submit" name="be_admin" value="Ole GM" />
 </form>
 {% else %}
 <h2 style="margin-bottom: 10px">GMAlue</h2>
@@ -151,17 +170,37 @@ Kukaan ei ole GM
 {% endif %}
 
 <form method="post">
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">Huoneessa olevat pelaajat</th>
+                </tr>
+            </thead>
+            <tbody id="players" class="players">
+                {% for player in players %}
+                <tr>
+                    <td>{{player}}</td>
+                    <td>
+                        <input type="submit" class="red" name="remove_player_{{player}}" value="POISTA" />
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
     {% if round_in_progress %}
     <input type="submit" name="end_round" value="Lopeta kierros" />
-    {% elif word_count > 0 and ready_player_count >= 2 %}
+    {% elif word_count > 0 and player_count >= 2 %}
     <input type="submit" id="start_round" name="start_round" value="Aloita kierros" />
     {% else %}
     <input type="submit" id="start_round" name="start_round" value="Aloita kierros" disabled />
     {% endif %}
 
-    <input name="unbe_admin" type="submit" value="Älä ole GM" />
+    <input type="submit" name="unbe_admin" value="Älä ole GM" />
     <input type="submit" name="reset_room" class="red" value="NOLLAA HUONE" />
-    <input name="delete_room" type="submit" class="red" value="POISTA HUONE" />
+    <input type="submit" name="delete_room" class="red" value="POISTA HUONE" />
 </form>
 {% endif %}
 

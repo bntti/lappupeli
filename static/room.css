@@ -26,3 +26,7 @@ tr:nth-child(even) {
   column-gap: 5px;
   grid-template-columns: calc(50% - 2.5px) calc(50% - 2.5px);
 }
+
+.players td:nth-child(2) {
+  padding:0px 3px 0px 0px !important;
+}

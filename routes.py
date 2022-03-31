@@ -4,7 +4,7 @@ from markupsafe import Markup
 from werkzeug.exceptions import NotFound, Unauthorized, BadRequest
 from flask import Response, abort, redirect, render_template, request, session, jsonify
 from app import app
-from repositories import card_repository, room_repository, word_repository, ready_player_repository
+from repositories import card_repository, player_repository, room_repository, word_repository
 import game_service as game_service
 
 
@@ -39,7 +39,7 @@ def url_encode(string: str) -> Markup:
 def index_get() -> Union[str, Response]:
     username = game_service.check_user()
     session["confirm"] = None
-    ready_player_repository.set_player_to_not_ready(username)
+    player_repository.leave_rooms(username)
     return render_template("index.html", rooms=room_repository.get_rooms())
 
 
@@ -53,14 +53,16 @@ def index_post() -> str:
 
 @app.route("/room/<path:room_name>/room_data", methods=["GET"])
 def room_data_get(room_name: str) -> Response:
-    game_service.check_user()
+    username = game_service.check_user()
     room_id = game_service.check_room(room_name)
+    players = player_repository.get_players(room_id)
     return jsonify({
-        "round_in_progress": card_repository.get_card_count(room_id) > 0,
-        "ready_player_count": ready_player_repository.get_ready_player_count(room_id),
+        "in_room": username in players,
+        "round_in_progress": game_service.round_in_progress(room_id),
         "seen_count": card_repository.get_seen_card_count(room_id),
-        "card_count": card_repository.get_card_count(room_id),
+        "player_count": player_repository.get_player_count(room_id),
         "word_count": word_repository.get_word_count(room_id),
+        "players": players,
         "config": room_repository.get_config(room_id)
     })
 
@@ -69,18 +71,19 @@ def room_data_get(room_name: str) -> Response:
 def room_get(room_name: str) -> str:
     username = game_service.check_user()
     room_id = game_service.check_room(room_name)
+    round_in_progress = game_service.round_in_progress(room_id)
+    if not round_in_progress:
+        player_repository.join_room(room_id, username)
     return render_template(
         "room.html",
         in_game=card_repository.has_card(room_id, username),
-        ready=ready_player_repository.is_ready(room_id, username),
-        ready_player_count=ready_player_repository.get_ready_player_count(
-            room_id),
+        round_in_progress=round_in_progress,
         seen=card_repository.has_seen_card(room_id, username),
         seen_count=card_repository.get_seen_card_count(room_id),
-        card_count=card_repository.get_card_count(room_id),
+        player_count=player_repository.get_player_count(room_id),
         word_count=word_repository.get_word_count(room_id),
-        round_in_progress=card_repository.get_card_count(room_id) > 0,
         config=room_repository.get_config(room_id),
+        players=player_repository.get_players(room_id),
         room_name=room_name
     )
 
@@ -93,10 +96,6 @@ def room_post(room_name: str) -> Union[str, Response]:
     # User
     if request.form.get("word"):
         game_service.add_word(room_id, request.form.get("word"), username)
-    if request.form.get("be_ready"):
-        ready_player_repository.set_ready(room_id, username)
-    if request.form.get("unbe_ready"):
-        ready_player_repository.set_not_ready(room_id, username)
     if request.form.get("be_admin"):
         room_repository.set_admin(room_id, username)
 
@@ -108,6 +107,9 @@ def room_post(room_name: str) -> Union[str, Response]:
         room_repository.set_admin(room_id, None)
     if request.form.get("start_round"):
         game_service.start_round(room_id)
+    for player in player_repository.get_players(room_id):
+        if request.form.get(f"remove_player_{player}"):
+            player_repository.leave_rooms(player)
 
     # Confirm and cancel
     if request.form.get("cancel"):
@@ -164,6 +166,6 @@ def login() -> Union[str, Response]:
 @app.route("/logout")
 def logout() -> Response:
     if "username" in session:
-        ready_player_repository.set_player_to_not_ready(session["username"])
+        player_repository.leave_rooms(session["username"])
         del session["username"]
     return redirect("/login")

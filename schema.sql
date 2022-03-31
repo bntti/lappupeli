@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS cards (
     seen BOOL DEFAULT false,
     UNIQUE (room_id, assigned_to)
 );
-CREATE TABLE IF NOT EXISTS ready_players (
+CREATE TABLE IF NOT EXISTS players (
     id SERIAL PRIMARY KEY,
     room_id INT REFERENCES rooms ON DELETE CASCADE NOT NULL,
     username TEXT NOT NULL,
