@@ -1,18 +1,8 @@
-from flask import abort
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 from database import database
 
 
-# Service functions
-def add_word(room_id: int, word: str, suggester_username: str) -> None:
-    if 0 < len(word) <= 64:
-        db_add_word(room_id, word, suggester_username)
-    else:
-        abort(400, "Sana ei saa olla tyhjä ja sen pituus saa olla enintään 64 merkkiä")
-
-
-# Database functions
 def get_words(room_id: int) -> list:
     sql = "SELECT word, suggester_username FROM words WHERE room_id = :room_id"
     result = database.session.execute(sql, {"room_id": room_id}).fetchall()
@@ -24,7 +14,7 @@ def get_word_count(room_id: int) -> int:
     return database.session.execute(sql, {"room_id": room_id}).fetchone()[0]
 
 
-def db_add_word(room_id: int, word: str, suggester_username: str) -> None:
+def add_word(room_id: int, word: str, suggester_username: str) -> None:
     try:
         sql = "INSERT INTO words (room_id, word, suggester_username) VALUES (:room_id, :word, :suggester_username)"
         database.session.execute(
@@ -45,4 +35,10 @@ def db_add_word(room_id: int, word: str, suggester_username: str) -> None:
 def remove_word(room_id: int, word: str) -> None:
     sql = "DELETE FROM words WHERE room_id = :room_id AND word = :word"
     database.session.execute(sql, {"room_id": room_id, "word": word})
+    database.session.commit()
+
+
+def delete_all(room_id: int) -> None:
+    sql = "DELETE FROM words WHERE room_id = :room_id"
+    database.session.execute(sql, {"room_id": room_id})
     database.session.commit()

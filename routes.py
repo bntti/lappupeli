@@ -4,11 +4,8 @@ from markupsafe import Markup
 from werkzeug.exceptions import NotFound, Unauthorized, BadRequest
 from flask import Response, abort, redirect, render_template, request, session, jsonify
 from app import app
-import services.card_service as card_service
-import services.room_service as room_service
-import services.word_service as word_service
-import services.game_service as game_service
-import services.ready_players_service as rps
+from repositories import card_repository, room_repository, word_repository, ready_player_repository
+import game_service as game_service
 
 
 # Error handlers
@@ -42,47 +39,48 @@ def url_encode(string: str) -> Markup:
 def index_get() -> Union[str, Response]:
     username = game_service.check_user()
     session["confirm"] = None
-    rps.set_player_to_not_ready(username)
-    return render_template("index.html", rooms=room_service.get_rooms())
+    ready_player_repository.set_player_to_not_ready(username)
+    return render_template("index.html", rooms=room_repository.get_rooms())
 
 
 @app.route("/", methods=["POST"])
 def index_post() -> str:
     game_service.check_user()
     if request.form.get("room_name"):
-        room_service.add_room(request.form.get("room_name"))
+        game_service.add_room(request.form.get("room_name"))
     return index_get()
 
 
 @app.route("/room/<path:room_name>/room_data", methods=["GET"])
 def room_data_get(room_name: str) -> Response:
     game_service.check_user()
-    room_id = room_service.check_room(room_name)
+    room_id = game_service.check_room(room_name)
     return jsonify({
-        "round_in_progress": card_service.get_card_count(room_id) > 0,
-        "ready_player_count": rps.get_ready_player_count(room_id),
-        "seen_count": card_service.get_seen_card_count(room_id),
-        "card_count": card_service.get_card_count(room_id),
-        "word_count": word_service.get_word_count(room_id),
-        "config": room_service.get_config(room_id)
+        "round_in_progress": card_repository.get_card_count(room_id) > 0,
+        "ready_player_count": ready_player_repository.get_ready_player_count(room_id),
+        "seen_count": card_repository.get_seen_card_count(room_id),
+        "card_count": card_repository.get_card_count(room_id),
+        "word_count": word_repository.get_word_count(room_id),
+        "config": room_repository.get_config(room_id)
     })
 
 
 @app.route("/room/<path:room_name>", methods=["GET"])
 def room_get(room_name: str) -> str:
     username = game_service.check_user()
-    room_id = room_service.check_room(room_name)
+    room_id = game_service.check_room(room_name)
     return render_template(
         "room.html",
-        in_game=card_service.has_card(room_id, username),
-        ready=rps.is_ready(room_id, username),
-        ready_player_count=rps.get_ready_player_count(room_id),
-        seen=card_service.has_seen_card(room_id, username),
-        seen_count=card_service.get_seen_card_count(room_id),
-        card_count=card_service.get_card_count(room_id),
-        word_count=word_service.get_word_count(room_id),
-        round_in_progress=card_service.get_card_count(room_id) > 0,
-        config=room_service.get_config(room_id),
+        in_game=card_repository.has_card(room_id, username),
+        ready=ready_player_repository.is_ready(room_id, username),
+        ready_player_count=ready_player_repository.get_ready_player_count(
+            room_id),
+        seen=card_repository.has_seen_card(room_id, username),
+        seen_count=card_repository.get_seen_card_count(room_id),
+        card_count=card_repository.get_card_count(room_id),
+        word_count=word_repository.get_word_count(room_id),
+        round_in_progress=card_repository.get_card_count(room_id) > 0,
+        config=room_repository.get_config(room_id),
         room_name=room_name
     )
 
@@ -90,24 +88,24 @@ def room_get(room_name: str) -> str:
 @app.route("/room/<path:room_name>", methods=["POST"])
 def room_post(room_name: str) -> Union[str, Response]:
     username = game_service.check_user()
-    room_id = room_service.check_room(room_name)
+    room_id = game_service.check_room(room_name)
 
     # User
     if request.form.get("word"):
-        word_service.add_word(room_id, request.form.get("word"), username)
+        game_service.add_word(room_id, request.form.get("word"), username)
     if request.form.get("be_ready"):
-        rps.set_ready(room_id, username)
+        ready_player_repository.set_ready(room_id, username)
     if request.form.get("unbe_ready"):
-        rps.set_not_ready(room_id, username)
+        ready_player_repository.set_not_ready(room_id, username)
     if request.form.get("be_admin"):
-        room_service.set_admin(room_id, username)
+        room_repository.set_admin(room_id, username)
 
     # Admin
-    if username != room_service.get_config(room_id)["admin_username"]:
+    if username != room_repository.get_config(room_id)["admin_username"]:
         return room_get(room_name)
 
     if request.form.get("unbe_admin"):
-        room_service.set_admin(room_id, None)
+        room_repository.set_admin(room_id, None)
     if request.form.get("start_round"):
         game_service.start_round(room_id)
 
@@ -116,7 +114,7 @@ def room_post(room_name: str) -> Union[str, Response]:
         session["confirm"] = None
     if request.form.get("confirm"):
         if session["confirm"] == "confirm_delete_room":
-            room_service.delete_room(room_id)
+            room_repository.delete_room(room_id)
             session["confirm"] = None
             return redirect("/")
         elif session["confirm"] == "confirm_reset_room":
@@ -127,7 +125,7 @@ def room_post(room_name: str) -> Union[str, Response]:
 
     # Actions that (might) require confirmation
     if request.form.get("end_round"):
-        if card_service.get_seen_card_count(room_id) != card_service.get_card_count(room_id):
+        if card_repository.get_seen_card_count(room_id) != card_repository.get_card_count(room_id):
             session["confirm"] = "confirm_end_round"
             session["confirm_message"] = "Kaikki eivät ole vielä nähneet lappuansa, haluatko varmasti lopettaa kierroksen?"
         else:
@@ -145,8 +143,8 @@ def room_post(room_name: str) -> Union[str, Response]:
 @app.route("/room/<path:room_name>/word")
 def word(room_name: str) -> str:
     username = game_service.check_user()
-    room_id = room_service.check_room(room_name)
-    return render_template("word.html", room_name=room_name, word=card_service.get_card(room_id, username))
+    room_id = game_service.check_room(room_name)
+    return render_template("word.html", room_name=room_name, word=game_service.get_card(room_id, username))
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -166,6 +164,6 @@ def login() -> Union[str, Response]:
 @app.route("/logout")
 def logout() -> Response:
     if "username" in session:
-        rps.set_player_to_not_ready(session["username"])
+        ready_player_repository.set_player_to_not_ready(session["username"])
         del session["username"]
     return redirect("/login")

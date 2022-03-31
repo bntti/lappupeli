@@ -3,7 +3,6 @@ from psycopg2.errors import UniqueViolation
 from database import database
 
 
-# Database functions
 def is_ready(room_id: int, username: str) -> bool:
     sql = "SELECT COUNT(*) > 0 FROM ready_players WHERE room_id = :room_id AND username = :username"
     result = database.session.execute(
@@ -49,6 +48,12 @@ def set_player_to_not_ready(username: str) -> None:
 
 
 def set_room_to_not_ready(room_id: int) -> None:
+    sql = "DELETE FROM ready_players WHERE room_id = :room_id"
+    database.session.execute(sql, {"room_id": room_id})
+    database.session.commit()
+
+
+def delete_all(room_id: int) -> None:
     sql = "DELETE FROM ready_players WHERE room_id = :room_id"
     database.session.execute(sql, {"room_id": room_id})
     database.session.commit()

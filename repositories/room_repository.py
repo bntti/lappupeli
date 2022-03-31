@@ -1,28 +1,9 @@
 from typing import Optional
-from flask import abort
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 from database import database
 
 
-# Service functions
-def check_room(room_name: str) -> int:
-    room_id = get_room_id(room_name)
-    if not room_id:
-        abort(404, f"Ei huonetta nimellä {room_name}")
-    return room_id
-
-
-def add_room(room_name: str) -> None:
-    if 0 < len(room_name) <= 32:
-        db_add_room(room_name)
-    else:
-        abort(
-            400, "Huoneen nimi ei saa olla tyhjä ja sen pituus saa olla enintään 32 merkkiä"
-        )
-
-
-# Database functions
 def get_room_id(room_name: str) -> Optional[int]:
     sql = "SELECT id FROM rooms WHERE name = :room_name"
     result = database.session.execute(sql, {"room_name": room_name}).fetchone()
@@ -35,7 +16,7 @@ def get_rooms() -> list[str]:
     return [row[0] for row in result]
 
 
-def db_add_room(room_name: str) -> None:
+def add_room(room_name: str) -> None:
     try:
         sql = "INSERT INTO rooms (name) VALUES (:room_name)"
         database.session.execute(sql, {"room_name": room_name})
@@ -89,5 +70,11 @@ def update_previous_word(room_id: int) -> None:
 
 def delete_room(room_id: int) -> None:
     sql = "DELETE FROM rooms WHERE id = :room_id"
+    database.session.execute(sql, {"room_id": room_id})
+    database.session.commit()
+
+
+def reset_room(room_id: int) -> None:
+    sql = "UPDATE rooms SET previous_word = NULL, current_word = NULL WHERE id = :room_id"
     database.session.execute(sql, {"room_id": room_id})
     database.session.commit()

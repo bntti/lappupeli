@@ -1,19 +1,6 @@
 from database import database
 
 
-# Service functions
-def get_card(room_id: int, username: str) -> str:
-    if get_card_count(room_id) == 0:
-        return "Kierros on loppunut / ei ole vielä alkanut"
-    if not has_card(room_id, username):
-        return "Et ole kierroksella mukana"
-
-    card = db_get_card(room_id, username)
-    set_seen(room_id, username)
-    return card
-
-
-# Database functions
 def add_card(room_id: int, word: str, username: str) -> None:
     sql = "INSERT INTO cards (room_id, word, assigned_to) VALUES (:room_id, :word, :username)"
     database.session.execute(
@@ -55,7 +42,7 @@ def has_seen_card(room_id: int, username: str) -> bool:
     return result[0] if result else False
 
 
-def db_get_card(room_id: int, username: str) -> str:
+def get_card(room_id: int, username: str) -> str:
     sql = "SELECT word FROM cards WHERE room_id = :room_id AND assigned_to = :username"
     result = database.session.execute(
         sql,
@@ -64,7 +51,7 @@ def db_get_card(room_id: int, username: str) -> str:
     return result.fetchone()[0]
 
 
-def clear_cards(room_id: int) -> None:
+def delete_all(room_id: int) -> None:
     sql = "DELETE FROM cards WHERE room_id = :room_id"
     database.session.execute(sql, {"room_id": room_id})
     database.session.commit()
