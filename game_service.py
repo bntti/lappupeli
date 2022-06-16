@@ -1,7 +1,13 @@
 import random
+
 from flask import abort, session
-from database import database
-from repositories import card_repository, player_repository, room_repository, word_repository
+
+from repositories import (
+    card_repository,
+    player_repository,
+    room_repository,
+    word_repository,
+)
 
 EMPTY_CARD = "Sait tyhjän lapun!"
 
@@ -31,7 +37,8 @@ def add_room(room_name: str) -> None:
         room_repository.add_room(room_name)
     else:
         abort(
-            400, "Huoneen nimi ei saa olla tyhjä ja sen pituus saa olla enintään 32 merkkiä"
+            400,
+            "Huoneen nimi ei saa olla tyhjä ja sen pituus saa olla enintään 32 merkkiä",
         )
 
 
@@ -56,7 +63,10 @@ def start_round(room_id: int) -> None:
     player_count = len(players)
 
     if len(words) == 0 or not 2 <= player_count <= 64:
-        abort(400, "Sanamäärän pitää olla yli 0 ja pelaajamäärän pitää olla vähintään 2 ja enintään 64")
+        abort(
+            400,
+            "Sanamäärän pitää olla yli 0 ja pelaajamäärän pitää olla vähintään 2 ja enintään 64",
+        )
 
     r = random.randint(1, 10)
     if r == 1:

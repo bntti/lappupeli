@@ -1,7 +1,8 @@
 from typing import Optional
-from sqlalchemy.exc import IntegrityError
-from psycopg2.errors import UniqueViolation
+
 from database import database
+from psycopg2.errors import UniqueViolation
+from sqlalchemy.exc import IntegrityError
 
 
 def get_room_id(room_name: str) -> Optional[int]:
@@ -34,7 +35,7 @@ def get_config(room_id: int) -> dict:
         "current_word": row[0],
         "previous_word": row[1],
         "admin_username": row[2],
-        "starter_username": row[3]
+        "starter_username": row[3],
     }
 
 
@@ -56,9 +57,7 @@ def set_starter(room_id: int, starter_username: str) -> None:
 
 def set_current_word(room_id: int, word: str) -> None:
     sql = "UPDATE rooms SET current_word = :word WHERE id = :room_id"
-    database.session.execute(
-        sql, {"room_id": room_id, "word": word}
-    )
+    database.session.execute(sql, {"room_id": room_id, "word": word})
     database.session.commit()
 
 
@@ -75,6 +74,8 @@ def delete_room(room_id: int) -> None:
 
 
 def reset_room(room_id: int) -> None:
-    sql = "UPDATE rooms SET previous_word = NULL, current_word = NULL WHERE id = :room_id"
+    sql = (
+        "UPDATE rooms SET previous_word = NULL, current_word = NULL WHERE id = :room_id"
+    )
     database.session.execute(sql, {"room_id": room_id})
     database.session.commit()

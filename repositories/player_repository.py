@@ -1,14 +1,12 @@
-from sqlalchemy.exc import IntegrityError
-from psycopg2.errors import UniqueViolation
 from database import database
+from psycopg2.errors import UniqueViolation
+from sqlalchemy.exc import IntegrityError
 
 
 def join_room(room_id: int, username: str) -> None:
     try:
         sql = "INSERT INTO players (room_id, username) VALUES (:room_id, :username)"
-        database.session.execute(
-            sql, {"room_id": room_id, "username": username}
-        )
+        database.session.execute(sql, {"room_id": room_id, "username": username})
         database.session.commit()
     except IntegrityError as error:
         # UNIQUE constraint fail

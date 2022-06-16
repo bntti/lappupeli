@@ -1,6 +1,6 @@
-from sqlalchemy.exc import IntegrityError
-from psycopg2.errors import UniqueViolation
 from database import database
+from psycopg2.errors import UniqueViolation
+from sqlalchemy.exc import IntegrityError
 
 
 def get_words(room_id: int) -> list:
@@ -22,8 +22,8 @@ def add_word(room_id: int, word: str, suggester_username: str) -> None:
             {
                 "room_id": room_id,
                 "word": word,
-                "suggester_username": suggester_username
-            }
+                "suggester_username": suggester_username,
+            },
         )
         database.session.commit()
     except IntegrityError as error:
