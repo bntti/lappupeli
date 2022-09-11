@@ -1,12 +1,15 @@
-import urllib.parse
 from typing import Union
 
-from flask import Response, abort, jsonify, redirect, render_template, request, session
-from markupsafe import Markup
-from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
-
 import game_service as game_service
-from app import app
+from flask import (
+    Blueprint,
+    Response,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+)
 from repositories import (
     card_repository,
     player_repository,
@@ -14,51 +17,10 @@ from repositories import (
     word_repository,
 )
 
-
-# Error handlers
-@app.errorhandler(400)
-def page_not_found(error: BadRequest) -> tuple[str, int]:
-    return render_template("error.html", error=error.description), 400
+room_bp = Blueprint("room", __name__)
 
 
-@app.errorhandler(401)
-def unauthorized(_: Unauthorized) -> tuple[str, int]:
-    return render_template("login.html"), 401
-
-
-@app.errorhandler(404)
-def page_not_found(error: NotFound) -> tuple[str, int]:
-    return render_template("error.html", error=error.description), 404
-
-
-# Url encoder
-@app.template_filter("urlencode")
-def url_encode(string: str) -> Markup:
-    if isinstance(string, Markup):
-        string = string.unescape()
-    string = string.encode("utf8")
-    string = urllib.parse.quote(string)
-    return Markup(string)
-
-
-# Routes
-@app.route("/", methods=["GET"])
-def index_get() -> Union[str, Response]:
-    username = game_service.check_user()
-    session["confirm"] = None
-    player_repository.leave_rooms(username)
-    return render_template("index.html", rooms=room_repository.get_rooms())
-
-
-@app.route("/", methods=["POST"])
-def index_post() -> str:
-    game_service.check_user()
-    if request.form.get("room_name"):
-        game_service.add_room(request.form.get("room_name"))
-    return index_get()
-
-
-@app.route("/room/<path:room_name>/room_data", methods=["GET"])
+@room_bp.route("/room/<path:room_name>/room_data", methods=["GET"])
 def room_data_get(room_name: str) -> Response:
     username = game_service.check_user()
     room_id = game_service.check_room(room_name)
@@ -76,7 +38,7 @@ def room_data_get(room_name: str) -> Response:
     )
 
 
-@app.route("/room/<path:room_name>", methods=["GET"])
+@room_bp.route("/room/<path:room_name>", methods=["GET"])
 def room_get(room_name: str) -> str:
     username = game_service.check_user()
     room_id = game_service.check_room(room_name)
@@ -97,7 +59,7 @@ def room_get(room_name: str) -> str:
     )
 
 
-@app.route("/room/<path:room_name>", methods=["POST"])
+@room_bp.route("/room/<path:room_name>", methods=["POST"])
 def room_post(room_name: str) -> Union[str, Response]:
     username = game_service.check_user()
     room_id = game_service.check_room(room_name)
@@ -155,33 +117,10 @@ def room_post(room_name: str) -> Union[str, Response]:
     return room_get(room_name)
 
 
-@app.route("/room/<path:room_name>/word")
+@room_bp.route("/room/<path:room_name>/word")
 def word(room_name: str) -> str:
     username = game_service.check_user()
     room_id = game_service.check_room(room_name)
     return render_template(
         "word.html", room_name=room_name, word=game_service.get_card(room_id, username)
     )
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login() -> Union[str, Response]:
-    if request.method == "POST" and request.form.get("username"):
-        username = request.form.get("username")
-        if 0 < len(username) <= 32:
-            session["username"] = username
-            return redirect("/")
-        else:
-            abort(
-                400,
-                "Käyttäjänimi ei saa olla tyhjä ja sen pituus saa olla enintään 32 merkkiä",
-            )
-    return render_template("login.html")
-
-
-@app.route("/logout")
-def logout() -> Response:
-    if "username" in session:
-        player_repository.leave_rooms(session["username"])
-        del session["username"]
-    return redirect("/login")
