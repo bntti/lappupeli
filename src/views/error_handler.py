@@ -5,7 +5,7 @@ error_handler_bp = Blueprint("error_handler", __name__)
 
 
 @error_handler_bp.app_errorhandler(400)
-def page_not_found(error: BadRequest) -> tuple[str, int]:
+def bad_request(error: BadRequest) -> tuple[str, int]:
     return render_template("error.html", error=error.description), 400
 
 

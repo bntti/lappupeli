@@ -1,4 +1,5 @@
 from flask import Blueprint, Response, redirect, session
+
 from repositories import player_repository
 
 logout_bp = Blueprint("logout", __name__)

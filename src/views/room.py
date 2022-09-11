@@ -1,6 +1,5 @@
 from typing import Union
 
-import game_service as game_service
 from flask import (
     Blueprint,
     Response,
@@ -10,6 +9,8 @@ from flask import (
     request,
     session,
 )
+
+import game_service
 from repositories import (
     card_repository,
     player_repository,
@@ -90,7 +91,7 @@ def room_post(room_name: str) -> Union[str, Response]:
             room_repository.delete_room(room_id)
             session["confirm"] = None
             return redirect("/")
-        elif session["confirm"] == "confirm_reset_room":
+        if session["confirm"] == "confirm_reset_room":
             game_service.reset_room(room_id)
         elif session["confirm"] == "confirm_end_round":
             game_service.end_round(room_id)

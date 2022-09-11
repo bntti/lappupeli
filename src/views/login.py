@@ -20,9 +20,8 @@ def login() -> Union[str, Response]:
         if 0 < len(username) <= 32:
             session["username"] = username
             return redirect("/")
-        else:
-            abort(
-                400,
-                "Käyttäjänimi ei saa olla tyhjä ja sen pituus saa olla enintään 32 merkkiä",
-            )
+        abort(
+            400,
+            "Käyttäjänimi ei saa olla tyhjä ja sen pituus saa olla enintään 32 merkkiä",
+        )
     return render_template("login.html")

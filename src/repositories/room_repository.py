@@ -1,8 +1,9 @@
 from typing import Optional
 
-from database import database
 from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
+
+from database import database
 
 
 def get_room_id(room_name: str) -> Optional[int]:

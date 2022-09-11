@@ -1,7 +1,8 @@
 from typing import Union
 
-import game_service as game_service
 from flask import Blueprint, Response, render_template, request, session
+
+import game_service
 from repositories import player_repository, room_repository
 
 index_bp = Blueprint("index", __name__)
