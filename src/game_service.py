@@ -68,7 +68,7 @@ def start_round(room_id: int) -> None:
             "Sanamäärän pitää olla yli 0 ja pelaajamäärän pitää olla vähintään 2 ja enintään 64",
         )
 
-    r = random.randint(1, 10)
+    r = random.randint(1, 10 * player_count)
     if r == 1:
         next_word, suggester_username = (EMPTY_CARD, None)
     else:
