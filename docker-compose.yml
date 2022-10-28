@@ -1,0 +1,32 @@
+version: '3'
+services:
+
+  server:
+    build: .
+    container_name: sanapeli-server
+    environment:
+      - DATABASE_URL=postgresql://postgres:example@db:5432/lappupeli
+      - SECRET_KEY=25jTtns0VibXf8EV1PP4XF81BtXFupNeFT5D3fEqerwfEvQwTPFNV2NI79pLHTJu
+    ports:
+      - 8000:8000
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: "postgres:15.0-alpine"
+    container_name: sanapeli-db
+    volumes:
+      - sanapeli-data:/var/lib/postgresql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=lappupeli
+    healthcheck:
+      test: "pg_isready -U postgres"
+      interval: 1s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  sanapeli-data:
