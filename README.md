@@ -1,7 +1,7 @@
 # Sanapeli
 
 A game in Finnish written with Python using Flask.
-[Link to the website](https://sanapeli.herokuapp.com/)
+[Link to the website](https://lappupeli.motsgar.fi/)
 
 ## Running the project
 

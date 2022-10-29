@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 set -eo pipefail
 
-poetry run invoke initialize-database
+poetry run python src/initialize_database.py
 
 exec "$@"

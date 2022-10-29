@@ -1,4 +1,4 @@
-FROM python:3.10 as python-base
+FROM python:3.10.8-alpine as python-base
 
 # https://python-poetry.org/docs#ci-recommendations
 ENV POETRY_VERSION=1.2.0
@@ -10,6 +10,9 @@ ENV POETRY_CACHE_DIR=/opt/.cache
 
 # Create stage for Poetry installation
 FROM python-base as poetry-base
+
+# Install build dependencies
+RUN apk add --no-cache gcc musl-dev
 
 # Creating a virtual environment just for poetry and install it with pip
 RUN python3 -m venv $POETRY_VENV \
