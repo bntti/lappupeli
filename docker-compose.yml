@@ -3,7 +3,7 @@ services:
 
   server:
     build: .
-    container_name: sanapeli-server
+    container_name: lappupeli-server
     environment:
       - DATABASE_URL=postgresql://postgres:devdbpassword@db:5432/lappupeli
       - SECRET_KEY=devsecretkey
@@ -15,9 +15,9 @@ services:
 
   db:
     image: "postgres:15.0-alpine"
-    container_name: sanapeli-db
+    container_name: lappupeli-db
     volumes:
-      - sanapeli-data:/var/lib/postgresql
+      - lappupeli-data:/var/lib/postgresql
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=devdbpassword
@@ -29,4 +29,4 @@ services:
       retries: 20
 
 volumes:
-  sanapeli-data:
+  lappupeli-data:

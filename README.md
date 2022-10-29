@@ -1,4 +1,4 @@
-# Sanapeli
+# Lappupeli
 
 A game in Finnish written with Python using Flask.
 [Link to the website](https://lappupeli.motsgar.fi/)
