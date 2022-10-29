@@ -1,4 +1,5 @@
-from flask import Blueprint, Response, redirect, session
+from flask import Blueprint, redirect, session
+from werkzeug.wrappers.response import Response
 
 from repositories import player_repository
 

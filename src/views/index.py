@@ -1,6 +1,4 @@
-from typing import Union
-
-from flask import Blueprint, Response, render_template, request, session
+from flask import Blueprint, render_template, request, session
 
 import game_service
 from repositories import player_repository, room_repository
@@ -9,7 +7,7 @@ index_bp = Blueprint("index", __name__)
 
 
 @index_bp.route("/", methods=["GET"])
-def index_get() -> Union[str, Response]:
+def index_get() -> str:
     username = game_service.check_user()
     session["confirm"] = None
     player_repository.leave_rooms(username)

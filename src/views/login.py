@@ -1,14 +1,7 @@
 from typing import Union
 
-from flask import (
-    Blueprint,
-    Response,
-    abort,
-    redirect,
-    render_template,
-    request,
-    session,
-)
+from flask import Blueprint, abort, redirect, render_template, request, session
+from werkzeug.wrappers.response import Response
 
 login_bp = Blueprint("login", __name__)
 

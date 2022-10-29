@@ -1,14 +1,7 @@
 from typing import Union
 
-from flask import (
-    Blueprint,
-    Response,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    session,
-)
+from flask import Blueprint, jsonify, redirect, render_template, request, session
+from werkzeug.wrappers.response import Response
 
 import game_service
 from repositories import (
