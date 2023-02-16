@@ -1,3 +1,5 @@
+from sqlalchemy.sql import text
+
 from app import create_app
 from database import database
 
@@ -9,7 +11,7 @@ def initialize_database():
     with open("schema.sql", "r", encoding="utf8") as schema_file:
         schema = schema_file.readlines()
 
-    database.session.execute("".join(schema))
+    database.session.execute(text("".join(schema)))
     database.session.commit()
 
 
