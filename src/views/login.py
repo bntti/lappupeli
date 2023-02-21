@@ -9,7 +9,7 @@ login_bp = Blueprint("login", __name__)
 @login_bp.route("/login", methods=["GET", "POST"])
 def login() -> Union[str, Response]:
     if request.method == "POST" and request.form.get("username"):
-        username = request.form.get("username")
+        username = request.form["username"]
         if 0 < len(username) <= 32:
             session["username"] = username
             return redirect("/")

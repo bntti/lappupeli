@@ -18,7 +18,8 @@ def get_word_count(room_id: int) -> int:
 
 def add_word(room_id: int, word: str, suggester_username: str) -> None:
     try:
-        sql = "INSERT INTO words (room_id, word, suggester_username) VALUES (:room_id, :word, :suggester_username)"
+        sql = """INSERT INTO words (room_id, word, suggester_username)
+                 VALUES (:room_id, :word, :suggester_username)"""
         database.session.execute(
             text(sql),
             {

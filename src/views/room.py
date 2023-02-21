@@ -60,7 +60,7 @@ def room_post(room_name: str) -> Union[str, Response]:
 
     # User
     if request.form.get("word"):
-        game_service.add_word(room_id, request.form.get("word"), username)
+        game_service.add_word(room_id, request.form["word"], username)
     if request.form.get("be_admin"):
         room_repository.set_admin(room_id, username)
 

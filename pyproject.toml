@@ -15,10 +15,18 @@ psycopg2-binary = "^2.9.5"
 [tool.poetry.dev-dependencies]
 black = "*"
 invoke = "^2.0.0"
+pylint = "^2.16.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.isort]
-sections = ['FUTURE', 'STDLIB', 'THIRDPARTY', 'FIRSTPARTY', 'LOCALFOLDER']
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+profile = "black"
+
+[tool.pylint.messages_control]
+disable = "missing-docstring"
+
+[tool.pylint.TYPECHECK]
+ignored-modules = "psycopg2.errors"

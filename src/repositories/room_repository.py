@@ -31,7 +31,8 @@ def add_room(room_name: str) -> None:
 
 
 def get_config(room_id: int) -> dict:
-    sql = "SELECT current_word, previous_word, admin_username, starter_username FROM rooms WHERE id = :room_id"
+    sql = """SELECT current_word, previous_word, admin_username, starter_username
+             FROM rooms WHERE id = :room_id"""
     row = database.session.execute(text(sql), {"room_id": room_id}).fetchone()
     return {
         "current_word": row[0],
