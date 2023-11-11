@@ -25,5 +25,11 @@ A game in Finnish written with Python using Flask.
 ### Running the project
 
 ```
+$ poetry run invoke dev
+```
+
+Or alternatively
+
+```
 $ poetry run invoke start
 ```
