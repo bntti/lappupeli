@@ -1,51 +1,21 @@
-FROM python:3.10.8-alpine as python-base
-
-# https://python-poetry.org/docs#ci-recommendations
-ENV POETRY_VERSION=1.2.0
-ENV POETRY_HOME=/opt/poetry
-ENV POETRY_VENV=/opt/poetry-venv
-
-# Tell Poetry where to place its cache and virtual environment
-ENV POETRY_CACHE_DIR=/opt/.cache
-
-# Create stage for Poetry installation
-FROM python-base as poetry-base
-
-# Install build dependencies
-RUN apk add --no-cache gcc musl-dev
-
-# Creating a virtual environment just for poetry and install it with pip
-RUN python3 -m venv $POETRY_VENV \
-    && $POETRY_VENV/bin/pip install -U pip setuptools \
-    && $POETRY_VENV/bin/pip install poetry==${POETRY_VERSION}
-
-# Create a new stage from the base python image
-FROM python-base as lappupeli
-
-# Copy Poetry to app image
-COPY --from=poetry-base ${POETRY_VENV} ${POETRY_VENV}
-
-# Add Poetry to PATH
-ENV PATH="${PATH}:${POETRY_VENV}/bin"
+FROM python:3.11.5-alpine
 
 WORKDIR /app
 
-# Copy Dependencies
-COPY poetry.lock pyproject.toml ./
+RUN pip install --no-cache-dir poetry
+RUN poetry config virtualenvs.create false
 
-# Install Dependencies
-RUN poetry install --no-interaction --no-cache --without dev
+COPY pyproject.toml .
+COPY poetry.lock .
+RUN poetry install --no-root --only main
 
-# Copy Application
-COPY src ./src/
-COPY tasks.py schema.sql ./
+COPY lappupeli lappupeli
+COPY docker-entrypoint.sh .
+COPY schema.sql .
+RUN chmod +x docker-entrypoint.sh
 
-# Copy Entrypoint
-COPY docker-entrypoint.sh /
-RUN chmod +x /docker-entrypoint.sh
 
-# Run Application
 EXPOSE 8000
 
-ENTRYPOINT [ "/docker-entrypoint.sh" ]
-CMD ["poetry", "run",  "gunicorn", "-b", "0.0.0.0:8000", "--chdir", "./src" ,"app:create_app()"]
+ENTRYPOINT [ "./docker-entrypoint.sh" ]
+CMD ["poetry", "run",  "gunicorn", "-b", "0.0.0.0:8000", "--chdir", "./lappupeli" ,"app:create_app()"]

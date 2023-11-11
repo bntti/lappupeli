@@ -33,3 +33,9 @@ Or alternatively
 ```
 $ poetry run invoke start
 ```
+
+### Running the project with docker
+
+```
+docker-compose up --build
+```

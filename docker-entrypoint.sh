@@ -1,6 +1,6 @@
 #!/bin/sh
 set -eo pipefail
 
-poetry run python src/initialize_database.py
+poetry run python lappupeli/initialize_database.py
 
 exec "$@"
