@@ -1,6 +1,4 @@
-version: '3'
 services:
-
   server:
     build: .
     container_name: lappupeli-server
@@ -14,7 +12,7 @@ services:
         condition: service_healthy
 
   db:
-    image: "postgres:15.0-alpine"
+    image: "postgres:18-alpine"
     container_name: lappupeli-db
     volumes:
       - lappupeli-data:/var/lib/postgresql
