@@ -1,6 +1,6 @@
 [project]
 name = "lappupeli"
-version = "0.1.5"
+version = "0.1.6"
 description = ""
 authors = [{ name = "Juho Röyskö", email = "<roysko.juho@gmail.com>" }]
 readme = "README.md"
@@ -17,7 +17,7 @@ dependencies = [
 [tool.poetry.group.dev.dependencies]
 black = "*"
 invoke = "^2.0.0"
-pylint = "^3.0.2"
+pylint = "^4.0.5"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
