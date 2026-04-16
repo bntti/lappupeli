@@ -18,20 +18,20 @@ A game in Finnish written with Python using Flask.
 
 2. Install the dependencies and initialize the database
    ```
-   $ poetry install
-   $ poetry run invoke initialize-database
+   $ uv sync
+   $ uv run invoke initialize-database
    ```
 
 ### Running the project
 
 ```
-$ poetry run invoke dev
+$ uv run invoke dev
 ```
 
 Or alternatively
 
 ```
-$ poetry run invoke start
+$ uv run invoke start
 ```
 
 ### Running the project with docker

@@ -1,34 +1,19 @@
 [project]
 name = "lappupeli"
 version = "0.1.6"
-description = ""
-authors = [{ name = "Juho Röyskö", email = "<roysko.juho@gmail.com>" }]
+description = "A game in Finnish written with Python using Flask."
 readme = "README.md"
-requires-python = ">= 3.10"
+requires-python = ">= 3.14"
 dependencies = [
-    "Flask~=3.1.0",
-    "Flask-SQLAlchemy~=3.1.0",
-    "python-dotenv~=1.2.0",
-    "gunicorn (>=25.0.3,<26.0.0)",
-    "psycopg2-binary~=2.9.5",
+    "flask>=3.1.3",
+    "flask-sqlalchemy>=3.1.1",
+    "gunicorn>=25.3.0",
+    "psycopg2-binary>=2.9.11",
+    "python-dotenv>=1.2.2",
 ]
 
-
-[tool.poetry.group.dev.dependencies]
-black = "*"
-invoke = "^2.0.0"
-pylint = "^4.0.5"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.isort]
-sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
-profile = "black"
-
-[tool.pylint.messages_control]
-disable = "missing-docstring"
-
-[tool.pylint.TYPECHECK]
-ignored-modules = "psycopg2.errors"
+[dependency-groups]
+dev = [
+    "invoke>=3.0.3",
+    "ruff>=0.15.10",
+]
