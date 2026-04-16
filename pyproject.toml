@@ -1,6 +1,6 @@
 [project]
 name = "lappupeli"
-version = "0.1.6"
+version = "0.1.7"
 description = "A game in Finnish written with Python using Flask."
 readme = "README.md"
 requires-python = ">= 3.14"
@@ -13,7 +13,4 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = [
-    "invoke>=3.0.3",
-    "ruff>=0.15.10",
-]
+dev = ["invoke>=3.0.3", "ruff>=0.15.10"]
