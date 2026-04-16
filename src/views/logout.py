@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, session
-from repositories import player_repository
 from werkzeug.wrappers.response import Response
+
+from repositories import player_repository
 
 logout_bp = Blueprint("logout", __name__)
 

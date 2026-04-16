@@ -1,5 +1,6 @@
-import game_service
 from flask import Blueprint, render_template, request, session
+
+import game_service
 from repositories import player_repository, room_repository
 
 index_bp = Blueprint("index", __name__)

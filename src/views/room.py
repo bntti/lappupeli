@@ -1,12 +1,13 @@
-import game_service
 from flask import Blueprint, jsonify, redirect, render_template, request, session
+from werkzeug.wrappers.response import Response
+
+import game_service
 from repositories import (
     card_repository,
     player_repository,
     room_repository,
     word_repository,
 )
-from werkzeug.wrappers.response import Response
 
 room_bp = Blueprint("room", __name__)
 

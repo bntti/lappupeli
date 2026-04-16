@@ -1,6 +1,7 @@
+from flask import Flask
+
 from config import SECRET_KEY, URL
 from database import database
-from flask import Flask
 from views import error_handler, index, login, logout, room, template_filter
 
 

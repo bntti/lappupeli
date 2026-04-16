@@ -1,5 +1,6 @@
-from database import database
 from sqlalchemy.sql import text
+
+from database import database
 from util import ann
 
 

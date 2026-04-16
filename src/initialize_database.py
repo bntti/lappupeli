@@ -1,6 +1,7 @@
+from sqlalchemy.sql import text
+
 from app import create_app
 from database import database
-from sqlalchemy.sql import text
 
 app = create_app()
 app.app_context().push()

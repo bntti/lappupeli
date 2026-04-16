@@ -1,7 +1,8 @@
-from database import database
 from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import text
+
+from database import database
 from util import ann
 
 
