@@ -1,8 +1,8 @@
+from database import database
 from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import text
-
-from database import database
+from util import ann
 
 
 def join_room(room_id: int, username: str) -> None:
@@ -30,7 +30,7 @@ def get_players(room_id: int) -> list[str]:
 
 def get_player_count(room_id: int) -> int:
     sql = "SELECT COUNT(*) FROM players WHERE room_id = :room_id"
-    return database.session.execute(text(sql), {"room_id": room_id}).fetchone()[0]
+    return ann(database.session.execute(text(sql), {"room_id": room_id}).fetchone())[0]
 
 
 def delete_all(room_id: int) -> None:

@@ -1,11 +1,10 @@
-from flask import Flask
-
 from config import SECRET_KEY, URL
 from database import database
+from flask import Flask
 from views import error_handler, index, login, logout, room, template_filter
 
 
-def create_app():
+def create_app() -> Flask:
     app = Flask(__name__)
     app.secret_key = SECRET_KEY
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False

@@ -1,8 +1,8 @@
+from database import database
 from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import text
-
-from database import database
+from util import ann
 
 
 def get_words(room_id: int) -> list:
@@ -13,7 +13,7 @@ def get_words(room_id: int) -> list:
 
 def get_word_count(room_id: int) -> int:
     sql = "SELECT COUNT(*) FROM words WHERE room_id = :room_id"
-    return database.session.execute(text(sql), {"room_id": room_id}).fetchone()[0]
+    return ann(database.session.execute(text(sql), {"room_id": room_id}).fetchone())[0]
 
 
 def add_word(room_id: int, word: str, suggester_username: str) -> None:

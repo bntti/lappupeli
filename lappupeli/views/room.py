@@ -1,15 +1,12 @@
-from typing import Union
-
-from flask import Blueprint, jsonify, redirect, render_template, request, session
-from werkzeug.wrappers.response import Response
-
 import game_service
+from flask import Blueprint, jsonify, redirect, render_template, request, session
 from repositories import (
     card_repository,
     player_repository,
     room_repository,
     word_repository,
 )
+from werkzeug.wrappers.response import Response
 
 room_bp = Blueprint("room", __name__)
 
@@ -28,7 +25,7 @@ def room_data_get(room_name: str) -> Response:
             "word_count": word_repository.get_word_count(room_id),
             "players": players,
             "config": room_repository.get_config(room_id),
-        }
+        },
     )
 
 
@@ -54,7 +51,7 @@ def room_get(room_name: str) -> str:
 
 
 @room_bp.route("/room/<path:room_name>", methods=["POST"])
-def room_post(room_name: str) -> Union[str, Response]:
+def room_post(room_name: str) -> str | Response:
     username = game_service.check_user()
     room_id = game_service.check_room(room_name)
 
@@ -93,12 +90,12 @@ def room_post(room_name: str) -> Union[str, Response]:
     # Actions that (might) require confirmation
     if request.form.get("end_round"):
         if card_repository.get_seen_card_count(
-            room_id
+            room_id,
         ) != card_repository.get_card_count(room_id):
             session["confirm"] = "confirm_end_round"
-            session[
-                "confirm_message"
-            ] = "Kaikki eivät ole vielä nähneet lappuansa, haluatko varmasti lopettaa kierroksen?"
+            session["confirm_message"] = (
+                "Kaikki eivät ole vielä nähneet lappuansa, haluatko varmasti lopettaa kierroksen?"
+            )
         else:
             game_service.end_round(room_id)
     if request.form.get("reset_room"):
@@ -116,5 +113,7 @@ def word(room_name: str) -> str:
     username = game_service.check_user()
     room_id = game_service.check_room(room_name)
     return render_template(
-        "word.html", room_name=room_name, word=game_service.get_card(room_id, username)
+        "word.html",
+        room_name=room_name,
+        word=game_service.get_card(room_id, username),
     )

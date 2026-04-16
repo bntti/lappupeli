@@ -1,14 +1,13 @@
-from sqlalchemy.sql import text
-
 from app import create_app
 from database import database
+from sqlalchemy.sql import text
 
 app = create_app()
 app.app_context().push()
 
 
-def initialize_database():
-    with open("schema.sql", "r", encoding="utf8") as schema_file:
+def initialize_database() -> None:
+    with open("schema.sql") as schema_file:
         schema = schema_file.readlines()
 
     database.session.execute(text("".join(schema)))

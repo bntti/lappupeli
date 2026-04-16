@@ -1,0 +1,75 @@
+line-length = 120
+
+[lint]
+select = [
+    # flake8-annotations
+    "ANN",
+    # flake8-bugbear
+    "B",
+    # flake8-builtins
+    "A",
+    # flake8-commas
+    "COM",
+    # flake8-comprehensions
+    "C4",
+    # flake8-pie
+    "PIE",
+    # "flake8-quotes",
+    "Q",
+    # flake8-return
+    "RET",
+    # flake8-simplify
+    "SIM",
+    # flake8-tidy-imports
+    "TID",
+    # flake8-unused-arguments
+    "ARG",
+    # isort
+    "I",
+    # pep8-naming
+    "N",
+    # pycodestyle
+    "E",
+    "W",
+    # pydocstyle
+    "D",
+    # Pyflakes
+    "F",
+    # Pylint
+    "PL",
+    # Error
+    "PLE",
+    # Refactor
+    "PLR",
+    # Warning
+    "PLW",
+    # pyupgrade
+    "UP",
+    # refurb
+    "FURB",
+    # Ruff-specific rules
+    "RUF",
+
+    # --- Library specific rules ---
+    # NumPy-specific rules
+    "NPY",
+    # pandas-vet
+    "PD",
+    # flake8-django
+    "DJ",
+]
+
+ignore = [
+    # undocumented-public-module
+    "D100",
+    # function docstring?
+    "D103",
+    # magic-value-comparison
+    "PLR2004",
+    # multi-line-summary-second-line
+    "D213",
+    # incorrect-blank-line-before-class
+    "D203",
+    # Causes problems with formatting?
+    "COM812",
+]

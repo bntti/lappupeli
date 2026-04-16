@@ -1,7 +1,6 @@
 import random
 
 from flask import abort, session
-
 from repositories import (
     card_repository,
     player_repository,

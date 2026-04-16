@@ -1,5 +1,3 @@
-from typing import Union
-
 from flask import Blueprint, abort, redirect, render_template, request, session
 from werkzeug.wrappers.response import Response
 
@@ -7,7 +5,7 @@ login_bp = Blueprint("login", __name__)
 
 
 @login_bp.route("/login", methods=["GET", "POST"])
-def login() -> Union[str, Response]:
+def login() -> str | Response:
     if request.method == "POST" and request.form.get("username"):
         username = request.form["username"]
         if 0 < len(username) <= 32:

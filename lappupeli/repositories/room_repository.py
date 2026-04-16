@@ -1,13 +1,11 @@
-from typing import Optional
-
+from database import database
 from psycopg2.errors import UniqueViolation
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import text
+from util import ann
 
-from database import database
 
-
-def get_room_id(room_name: str) -> Optional[int]:
+def get_room_id(room_name: str) -> int | None:
     sql = "SELECT id FROM rooms WHERE name = :room_name"
     result = database.session.execute(text(sql), {"room_name": room_name}).fetchone()
     return result[0] if result else None
@@ -33,7 +31,7 @@ def add_room(room_name: str) -> None:
 def get_config(room_id: int) -> dict:
     sql = """SELECT current_word, previous_word, admin_username, starter_username
              FROM rooms WHERE id = :room_id"""
-    row = database.session.execute(text(sql), {"room_id": room_id}).fetchone()
+    row = ann(database.session.execute(text(sql), {"room_id": room_id}).fetchone())
     return {
         "current_word": row[0],
         "previous_word": row[1],
@@ -42,10 +40,11 @@ def get_config(room_id: int) -> dict:
     }
 
 
-def set_admin(room_id: int, admin_username: Optional[str]) -> None:
+def set_admin(room_id: int, admin_username: str | None) -> None:
     sql = "UPDATE rooms SET admin_username = :admin_username WHERE id = :room_id"
     database.session.execute(
-        text(sql), {"room_id": room_id, "admin_username": admin_username}
+        text(sql),
+        {"room_id": room_id, "admin_username": admin_username},
     )
     database.session.commit()
 
@@ -53,7 +52,8 @@ def set_admin(room_id: int, admin_username: Optional[str]) -> None:
 def set_starter(room_id: int, starter_username: str) -> None:
     sql = "UPDATE rooms SET starter_username = :starter_username WHERE id = :room_id"
     database.session.execute(
-        text(sql), {"room_id": room_id, "starter_username": starter_username}
+        text(sql),
+        {"room_id": room_id, "starter_username": starter_username},
     )
     database.session.commit()
 
@@ -77,8 +77,6 @@ def delete_room(room_id: int) -> None:
 
 
 def reset_room(room_id: int) -> None:
-    sql = (
-        "UPDATE rooms SET previous_word = NULL, current_word = NULL WHERE id = :room_id"
-    )
+    sql = "UPDATE rooms SET previous_word = NULL, current_word = NULL WHERE id = :room_id"
     database.session.execute(text(sql), {"room_id": room_id})
     database.session.commit()
