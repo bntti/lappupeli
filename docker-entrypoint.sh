@@ -1,6 +1,6 @@
 #!/bin/sh
 set -eo pipefail
 
-uv run python lappupeli/initialize_database.py
+uv run python src/initialize_database.py
 
 exec "$@"

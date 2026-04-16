@@ -9,7 +9,7 @@ COPY uv.lock .
 ENV UV_NO_DEV=1
 RUN uv sync --locked
 
-COPY lappupeli lappupeli
+COPY src src
 COPY docker-entrypoint.sh .
 COPY schema.sql .
 RUN chmod +x docker-entrypoint.sh
@@ -18,4 +18,4 @@ RUN chmod +x docker-entrypoint.sh
 EXPOSE 8000
 
 ENTRYPOINT [ "./docker-entrypoint.sh" ]
-CMD ["uv", "run",  "gunicorn", "-b", "0.0.0.0:8000", "--chdir", "./lappupeli" ,"app:create_app()"]
+CMD ["uv", "run",  "gunicorn", "-b", "0.0.0.0:8000", "--chdir", "./src" ,"app:create_app()"]
